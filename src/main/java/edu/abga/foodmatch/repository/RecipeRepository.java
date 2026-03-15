@@ -15,12 +15,13 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     /**
-     * Busca y devuelve una lista de recetas que coinciden con una categoría específica.
+     * Busca y devuelve una lista de recetas que coinciden con una categoría específica,
+     * ignorando mayúsculas y minúsculas.
      *
      * @param category La categoría por la que filtrar (ej. "Desayuno", "Cena").
      * @return Lista de recetas que pertenecen a dicha categoría.
      */
-    List<Recipe> findByCategory(String category);
+    List<Recipe> findByCategoryIgnoreCase(String category);
 
     /**
      * Busca y devuelve una lista de recetas cuyo tiempo de preparación sea
