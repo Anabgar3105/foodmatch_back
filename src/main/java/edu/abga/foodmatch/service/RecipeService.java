@@ -1,6 +1,6 @@
 package edu.abga.foodmatch.service;
 
-import edu.abga.foodmatch.handler.FoodMatchException;
+import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.Recipe;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;

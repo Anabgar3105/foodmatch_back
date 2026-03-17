@@ -1,4 +1,4 @@
-package edu.abga.foodmatch.handler;
+package edu.abga.foodmatch.exception;
 
 
 import lombok.Builder;

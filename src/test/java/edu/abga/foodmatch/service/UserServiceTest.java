@@ -1,6 +1,6 @@
 package edu.abga.foodmatch.service;
 
-import edu.abga.foodmatch.handler.FoodMatchException;
+import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.User;
 import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import edu.abga.foodmatch.model.dto.UserResponseDto;
@@ -70,7 +70,7 @@ class UserServiceTest {
 
     /**
      * Verifica que el sistema rechaza el registro y lanza un {@link FoodMatchException}
-     * con estado HTTP 409 (Conflict) cuando el email proporcionado ya está registrado.
+     * con HTTP code 409 cuando el email proporcionado ya está registrado.
      */
     @Test
     void registerUserThrowsExceptionWhenEmailAlreadyExists() {
@@ -86,7 +86,7 @@ class UserServiceTest {
 
     /**
      * Verifica que el sistema rechaza el registro y lanza un {@link FoodMatchException}
-     * con estado HTTP 409 (Conflict) cuando el nombre de usuario (username) ya está en uso.
+     * con código 409 cuando el nombre de usuario (username) ya está en uso.
      */
     @Test
     void registerUserThrowsExceptionWhenUsernameAlreadyExists() {
@@ -120,7 +120,7 @@ class UserServiceTest {
 
     /**
      * Verifica que el inicio de sesión falla y lanza un {@link FoodMatchException}
-     * con estado HTTP 401 (Unauthorized) cuando el usuario existe, pero
+     * con código 401 cuando el usuario existe, pero
      * la contraseña introducida es incorrecta.
      */
     @Test
