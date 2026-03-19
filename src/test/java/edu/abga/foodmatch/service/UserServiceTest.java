@@ -6,6 +6,7 @@ import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import edu.abga.foodmatch.model.dto.UserResponseDto;
 import edu.abga.foodmatch.model.mapper.UserMapper;
 import edu.abga.foodmatch.repository.UserRepository;
+import edu.abga.foodmatch.util.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

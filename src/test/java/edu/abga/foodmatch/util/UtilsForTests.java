@@ -1,4 +1,4 @@
-package edu.abga.foodmatch.service;
+package edu.abga.foodmatch.util;
 
 import edu.abga.foodmatch.model.Recipe;
 import edu.abga.foodmatch.model.User;
@@ -21,7 +21,7 @@ public class UtilsForTests {
                 .surname1("Redondo")
                 .email("dredondo@email.com")
                 .username("d.redondo")
-                .password("1234")
+                .password("Secreta123")
                 .build();
     }
 

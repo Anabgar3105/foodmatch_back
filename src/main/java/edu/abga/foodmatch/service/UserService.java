@@ -8,6 +8,7 @@ import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import edu.abga.foodmatch.model.dto.UserResponseDto;
 import edu.abga.foodmatch.model.mapper.UserMapper;
 import edu.abga.foodmatch.repository.UserRepository;
+import edu.abga.foodmatch.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,14 +32,17 @@ public class UserService {
      *
      * @param registrationDto Objeto con los datos de registro del usuario.
      * @return UserResponseDto con los datos del usuario recién creado.
-     * @throws FoodMatchException Si el email o el nombre de usuario ya están en uso en la BD.
+     * @throws FoodMatchException Si los datos de registro no son válidos.
      */
     public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
+        ValidationUtils.validateRegistrationData(registrationDto);
 
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
-            throw new FoodMatchException("El email ya está en uso", HttpStatus.CONFLICT);        }
+            throw new FoodMatchException("El email ya está en uso", HttpStatus.CONFLICT);
+        }
         if (userRepository.existsByUsername(registrationDto.getUsername())) {
-            throw new FoodMatchException("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);        }
+            throw new FoodMatchException("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);
+        }
 
         User userToSave = userMapper.toEntity(registrationDto);
         userToSave.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
@@ -50,6 +54,7 @@ public class UserService {
 
     /**
      * Verifica las credenciales de un usuario.
+     *
      * @return El DTO del usuario si los datos son correctos.
      * @throws FoodMatchException si las credenciales no coinciden.
      */
