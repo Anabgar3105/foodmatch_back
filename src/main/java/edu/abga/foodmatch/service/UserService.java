@@ -2,6 +2,7 @@ package edu.abga.foodmatch.service;
 
 
 import edu.abga.foodmatch.exception.FoodMatchException;
+import edu.abga.foodmatch.model.Role;
 import edu.abga.foodmatch.model.User;
 import edu.abga.foodmatch.model.dto.UserLoginDto;
 import edu.abga.foodmatch.model.dto.UserRegistrationDto;
@@ -46,6 +47,7 @@ public class UserService {
 
         User userToSave = userMapper.toEntity(registrationDto);
         userToSave.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+        userToSave.setRole(Role.USER);
         User savedUser = userRepository.save(userToSave);
 
         return userMapper.toResponseDto(savedUser);

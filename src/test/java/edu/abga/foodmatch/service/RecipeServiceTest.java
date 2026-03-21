@@ -55,7 +55,7 @@ class RecipeServiceTest {
 
         assertNotNull(result);
         assertEquals("Tortilla de Patatas", result.getTitle());
-        verify(recipeRepository, times(1)).save(any(Recipe.class));
+        verify(recipeRepository).save(any(Recipe.class));
     }
 
     /**
@@ -110,7 +110,7 @@ class RecipeServiceTest {
         assertNotNull(results);
         assertEquals(1, results.size());
         assertEquals("Tortilla de Patatas", results.get(0).getTitle());
-        verify(recipeRepository, times(1)).findByCategoryIgnoreCase(targetCategory);
+        verify(recipeRepository).findByCategoryIgnoreCase(targetCategory);
     }
 
     /**
@@ -128,7 +128,7 @@ class RecipeServiceTest {
         List<RecipeCardDto> results = recipeService.searchRecipes(null, maxTime);
 
         assertFalse(results.isEmpty());
-        verify(recipeRepository, times(1)).findByPreparationTimeLessThanEqual(maxTime);
+        verify(recipeRepository).findByPreparationTimeLessThanEqual(maxTime);
     }
 
     /**
@@ -143,6 +143,6 @@ class RecipeServiceTest {
         List<RecipeDetailDto> results = recipeService.getAllRecipes();
 
         assertEquals(1, results.size());
-        verify(recipeRepository, times(1)).findAll();
+        verify(recipeRepository).findAll();
     }
 }

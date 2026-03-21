@@ -67,10 +67,11 @@ public class User {
     private String password;
 
     /**
-     * Rol
+     * Role
      */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String role;
+    private Role role;
 
     /**
      * RegisterDate
