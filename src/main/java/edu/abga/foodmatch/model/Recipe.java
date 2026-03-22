@@ -48,8 +48,9 @@ public class Recipe {
     /**
      * Category
      */
-    @Column(length = 50)
-    private String category;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private RecipeCategory category;
 
     /**
      * Image
