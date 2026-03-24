@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Servicio para la gestión de recetas.
+ * Service for recipe management.
  */
 @Service
 @RequiredArgsConstructor
@@ -25,8 +25,8 @@ public class RecipeService {
     private final RecipeMapper recipeMapper;
 
     /**
-     * Guarda una nueva receta validando los datos de entrada.
-     * @throws FoodMatchException si los datos de la receta son inválidos.
+     * Saves a new recipe, validating the input data.
+     * @throws FoodMatchException if the recipe data is invalid.
      */
     @Transactional
     public RecipeDetailDto createRecipe(RecipeDetailDto dto) {
@@ -52,7 +52,7 @@ public class RecipeService {
     }
 
     /**
-     * Obtiene todas las recetas registradas.
+     * Gets all registered recipes.
      */
     @Transactional(readOnly = true)
     public List<RecipeDetailDto> getAllRecipes() {
@@ -62,10 +62,10 @@ public class RecipeService {
     }
 
     /**
-     * Busca recetas aplicando filtros opcionales.
-     * @param category Categoría exacta (ej. "Cena"). Puede ser null.
-     * @param maxTime Tiempo máximo en minutos. Puede ser null.
-     * @return Lista de recetas en formato tarjeta (más ligero).
+     * Searches for recipes applying optional filters.
+     * @param category Exact category. Can be null.
+     * @param maxTime Maximum time in minutes. Can be null.
+     * @return List of recipes in card format.
      */
     @Transactional(readOnly = true)
     public List<RecipeCardDto> searchRecipes(String category, Integer maxTime) {

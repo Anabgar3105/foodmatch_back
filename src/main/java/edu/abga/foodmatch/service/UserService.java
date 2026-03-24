@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Servicio que contiene la lógica de negocio para la gestión de usuarios.
+ * Service that contains the business logic for user management.
  */
 @Service
 @RequiredArgsConstructor
@@ -27,13 +27,13 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
-     * Procesa el registro de un nuevo usuario en el sistema.
-     * Valida que el email y el nombre de usuario no existan previamente.
-     * Transforma el DTO de entrada a Entidad, lo guarda y devuelve una respuesta segura.
+     * Processes the registration of a new user in the system.
+     * Validates that the email and username do not already exist.
+     * Transforms the input DTO to an Entity, saves it, and returns a secure response.
      *
-     * @param registrationDto Objeto con los datos de registro del usuario.
-     * @return UserResponseDto con los datos del usuario recién creado.
-     * @throws FoodMatchException Si los datos de registro no son válidos.
+     * @param registrationDto Object with the user's registration data.
+     * @return UserResponseDto with the data of the newly created user.
+     * @throws FoodMatchException If the registration data is not valid.
      */
     public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
         ValidationUtils.validateRegistrationData(registrationDto);
@@ -55,10 +55,10 @@ public class UserService {
 
 
     /**
-     * Verifica las credenciales de un usuario.
+     * Verifies a user's credentials.
      *
-     * @return El DTO del usuario si los datos son correctos.
-     * @throws FoodMatchException si las credenciales no coinciden.
+     * @return The user's DTO if the data is correct.
+     * @throws FoodMatchException if the credentials do not match.
      */
     public UserResponseDto login(UserLoginDto loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsername())

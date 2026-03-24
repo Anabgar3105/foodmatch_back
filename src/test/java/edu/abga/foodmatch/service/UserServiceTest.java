@@ -23,8 +23,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Suite de pruebas unitarias para la clase {@link UserService}.
- * Todos los datos ficticios se proveen mediante la clase auxiliar {@link UtilsForTests}.
+ * Unit test suite for the {@link UserService} class.
+ * All mock data is provided by the {@link UtilsForTests} helper class.
  */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -42,8 +42,8 @@ class UserServiceTest {
     private UserService userService;
 
     /**
-     * Verifica que el flujo de registro se completa satisfactoriamente cuando
-     * los datos son correctos y el usuario no existe previamente en el sistema.
+     * Verifies that the registration flow is completed successfully when
+     * the data is correct and the user does not previously exist in the system.
      */
     @Test
     void registerUserSuccess() {
@@ -70,8 +70,8 @@ class UserServiceTest {
     }
 
     /**
-     * Verifica que el sistema rechaza el registro y lanza un {@link FoodMatchException}
-     * con HTTP code 409 cuando el email proporcionado ya está registrado.
+     * Verifies that the system rejects the registration and throws a {@link FoodMatchException}
+     * with HTTP code 409 when the provided email is already registered.
      */
     @Test
     void registerUserThrowsExceptionWhenEmailAlreadyExists() {
@@ -86,8 +86,8 @@ class UserServiceTest {
     }
 
     /**
-     * Verifica que el sistema rechaza el registro y lanza un {@link FoodMatchException}
-     * con código 409 cuando el nombre de usuario (username) ya está en uso.
+     * Verifies that the system rejects the registration and throws a {@link FoodMatchException}
+     * with code 409 when the username is already in use.
      */
     @Test
     void registerUserThrowsExceptionWhenUsernameAlreadyExists() {
@@ -102,9 +102,9 @@ class UserServiceTest {
     }
 
     /**
-     * Verifica que el proceso de inicio de sesión funciona correctamente cuando
-     * el usuario existe en la base de datos y la contraseña plana coincide con
-     * el hash almacenado.
+     * Verifies that the login process works correctly when
+     * the user exists in the database and the plain password matches
+     * the stored hash.
      */
     @Test
     void loginSuccess() {
@@ -120,9 +120,9 @@ class UserServiceTest {
     }
 
     /**
-     * Verifica que el inicio de sesión falla y lanza un {@link FoodMatchException}
-     * con código 401 cuando el usuario existe, pero
-     * la contraseña introducida es incorrecta.
+     * Verifies that the login fails and throws a {@link FoodMatchException}
+     * with code 401 when the user exists, but
+     * the entered password is incorrect.
      */
     @Test
     void loginThrowsExceptionWhenPasswordIsIncorrect() {

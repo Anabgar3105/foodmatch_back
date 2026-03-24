@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controlador REST para la gestión del catálogo de recetas.
- * Proporciona los endpoints para crear, consultar y filtrar recetas.
+ * REST controller for managing the recipe catalog.
+ * Provides endpoints for creating, querying, and filtering recipes.
  */
 @RestController
 @RequestMapping("/api/recipes")
@@ -25,11 +25,11 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     /**
-     * Endpoint para la creación de una nueva receta.
-     * Guarda la receta junto con sus listas asociadas (ingredientes y pasos de elaboración).
+     * Endpoint for creating a new recipe.
+     * Saves the recipe along with its associated lists (ingredients and elaboration steps).
      *
-     * @param dto con la información completa de la receta.
-     * @return ResponseEntity con el DTO de la receta creada y el estado HTTP 201.
+     * @param dto with the complete information of the recipe.
+     * @return ResponseEntity with the DTO of the created recipe and HTTP status 201.
      */
     @PostMapping
     @Operation(summary = "Crear receta", description = "Guarda una receta con sus ingredientes y pasos")
@@ -38,9 +38,9 @@ public class RecipeController {
     }
 
     /**
-     * Endpoint para obtener el catálogo completo de recetas.
+     * Endpoint to get the complete catalog of recipes.
      *
-     * @return List<RecipeDetailDto> con el detalle de todas las recetas registradas en el sistema.
+     * @return List<RecipeDetailDto> with the details of all recipes registered in the system.
      */
     @GetMapping
     @Operation(summary = "Listar recetas", description = "Obtiene todas las recetas disponibles")
@@ -49,12 +49,12 @@ public class RecipeController {
     }
 
     /**
-     * Endpoint para buscar y filtrar recetas en el catálogo.
-     * Permite combinar parámetros de búsqueda opcionales.
+     * Endpoint to search and filter recipes in the catalog.
+     * Allows combining optional search parameters.
      *
-     * @param category Categoría de la receta a buscar. (Opcional)
-     * @param maxTime Tiempo máximo de preparación en minutos. (Opcional)
-     * @return ResponseEntity con una lista de DTOs en formato tarjeta que cumplen los criterios.
+     * @param category Category of the recipe to search for. (Optional)
+     * @param maxTime Maximum preparation time in minutes. (Optional)
+     * @return ResponseEntity with a list of DTOs in card format that meet the criteria.
      */
     @GetMapping("/search")
     @Operation(summary = "Buscar recetas", description = "Filtra recetas por categoría o por tiempo de preparación máximo")

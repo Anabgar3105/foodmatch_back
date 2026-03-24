@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Pruebas de integración de la capa Web para {@link RecipeController}.
+ * Integration tests for the Web layer for {@link RecipeController}.
  */
 @WebMvcTest(RecipeController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -38,7 +38,7 @@ class RecipeControllerTest {
     private RecipeService recipeService;
 
     /**
-     * Verifica el flujo de éxito (Happy Path) al crear una nueva receta.
+     * Verifies the success flow (Happy Path) when creating a new recipe.
      */
     @Test
     void createRecipeReturnsCreatedStatusAndRecipeDetail() throws Exception {
@@ -56,8 +56,8 @@ class RecipeControllerTest {
     }
 
     /**
-     * Verifica que el controlador maneja correctamente las excepciones de validación
-     * al intentar crear una receta con datos incompletos.
+     * Verifies that the controller correctly handles validation exceptions
+     * when trying to create a recipe with incomplete data.
      */
     @Test
     void createRecipeReturnsBadRequestWhenNoRecipeTitle() throws Exception {
@@ -75,7 +75,7 @@ class RecipeControllerTest {
     }
 
     /**
-     * Verifica el correcto funcionamiento del endpoint de listado general de recetas.
+     * Verifies the correct functioning of the general recipe listing endpoint.
      */
     @Test
     void getAllRecipesReturnsOkStatusAndJsonArray() throws Exception {
@@ -89,7 +89,7 @@ class RecipeControllerTest {
     }
 
     /**
-     * Verifica que el endpoint de búsqueda procesa correctamente los parámetros de consulta (Query Params).
+     * Verifies that the search endpoint correctly processes the query parameters (Query Params).
      */
     @Test
     void searchRecipesReturnsOkStatusAndFiltersCorrectly() throws Exception {

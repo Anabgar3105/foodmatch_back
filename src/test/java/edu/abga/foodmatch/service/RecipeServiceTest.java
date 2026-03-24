@@ -21,9 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Suite de pruebas unitarias para {@link RecipeService}.
- * Verifica la lógica de negocio, las validaciones de entrada y los diferentes
- * flujos de filtrado del catálogo de recetas.
+ * Unit test suite for {@link RecipeService}.
+ * Verifies the business logic, input validations, and the different
+ * filtering flows of the recipe catalog.
  */
 @ExtendWith(MockitoExtension.class)
 class RecipeServiceTest {
@@ -38,9 +38,9 @@ class RecipeServiceTest {
     private RecipeService recipeService;
 
     /**
-     * Verifica que la creación de una receta se complete exitosamente cuando se
-     * proporcionan datos válidos. Se asegura que el repositorio se invoque correctamente
-     * y que el DTO de salida contenga la información esperada.
+     * Verifies that the creation of a recipe is completed successfully when
+     * valid data is provided. It ensures that the repository is invoked correctly
+     * and that the output DTO contains the expected information.
      */
     @Test
     void createRecipeSuccess() {
@@ -59,9 +59,9 @@ class RecipeServiceTest {
     }
 
     /**
-     * Verifica que el servicio lance una excepción con el mensaje y código de estado (400 Bad Request)
-     * correctos cuando se intenta crear una receta sin título. Además, se asegura que
-     * el repositorio no se invoque para guardar la entidad.
+     * Verifies that the service throws an exception with the correct message and status code (400 Bad Request)
+     * when trying to create a recipe without a title. It also ensures that
+     * the repository is not invoked to save the entity.
      */
     @Test
     void createRecipeThrowsExceptionWhenTitleIsMissing() {
@@ -76,9 +76,9 @@ class RecipeServiceTest {
     }
 
     /**
-     * Verifica la validación que impide establecer un tiempo de preparación
-     * con valor negativo. Comprueba que se lance la excepción correspondiente
-     * y se aborte el guardado.
+     * Verifies the validation that prevents setting a preparation time
+     * with a negative value. It checks that the corresponding exception is thrown
+     * and the save is aborted.
      */
     @Test
     void createRecipeThrowsExceptionWhenTimeIsNegative() {
@@ -93,9 +93,9 @@ class RecipeServiceTest {
     }
 
     /**
-     * Comprueba que el buscador aplica correctamente el filtro por categoría,
-     * delegando en el method personalizado del repositorio y mapeando
-     * el resultado a un CardDto.
+     * Checks that the search engine correctly applies the filter by category,
+     * delegating to the custom method of the repository and mapping
+     * the result to a CardDto.
      */
     @Test
     void searchRecipesByCategorySuccess() {
@@ -114,8 +114,8 @@ class RecipeServiceTest {
     }
 
     /**
-     * Comprueba que el buscador aplica correctamente el filtro de tiempo máximo,
-     * aislando la búsqueda de otros parámetros como la categoría.
+     * Checks that the search engine correctly applies the maximum time filter,
+     * isolating the search from other parameters such as the category.
      */
     @Test
     void searchRecipesByMaxTimeSuccess() {
@@ -132,8 +132,8 @@ class RecipeServiceTest {
     }
 
     /**
-     * Verifica que al invocar la obtención del catálogo completo,
-     * el servicio recupera todos los registros sin aplicar filtros.
+     * Verifies that when invoking the retrieval of the complete catalog,
+     * the service retrieves all records without applying filters.
      */
     @Test
     void getAllRecipesReturnsFullList() {

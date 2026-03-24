@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     /**
-     * Captura las excepciones personalizadas (FoodMatchException).
+     * Catches custom exceptions (FoodMatchException).
      */
     @ExceptionHandler(FoodMatchException.class)
     public ResponseEntity<ErrorResponse> handleFoodMatchException(FoodMatchException ex, HttpServletRequest request) {
@@ -28,11 +28,11 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Captura cualquier otro error inesperado (Error 500).
+     * Catches any other unexpected error (Error 500).
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
-        // Aquí podrías usar un logger para registrar el error real en consola
+        // Here you could use a logger to log the actual error in the console
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(500)

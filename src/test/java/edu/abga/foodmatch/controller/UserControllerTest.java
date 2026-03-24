@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Pruebas de integración de la capa Web para {@link UserController}.
+ * Integration tests for the Web layer for {@link UserController}.
  */
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -36,7 +36,7 @@ class UserControllerTest {
     private UserService userService;
 
     /**
-     * Verifica el flujo de éxito (Happy Path) del registro de usuario.
+     * Verifies the success flow (Happy Path) of user registration.
      */
     @Test
     void registerSuccessReturnsCreatedStatusAndUserDto() throws Exception {
@@ -53,7 +53,7 @@ class UserControllerTest {
     }
 
     /**
-     * Verifica que el controlador intercepte correctamente los errores de validación.
+     * Verifies that the controller correctly intercepts validation errors.
      */
     @Test
     void registerReturnsBadRequestWhenDataIsInvalid() throws Exception {
@@ -73,7 +73,7 @@ class UserControllerTest {
     }
 
     /**
-     * Verifica el flujo de éxito para la autenticación de usuarios.
+     * Verifies the success flow for user authentication.
      */
     @Test
     void loginReturnsOkStatusAndUserDto() throws Exception {
@@ -89,8 +89,8 @@ class UserControllerTest {
     }
 
     /**
-     * Verifica el comportamiento del sistema ante un intento de acceso no autorizado
-     * con una contraseña incorrecta.
+     * Verifies the system's behavior in the event of an unauthorized access attempt
+     * with an incorrect password.
      */
     @Test
     void loginReturnsUnauthorizedWhenCredentialsAreWrong() throws Exception {
@@ -110,8 +110,8 @@ class UserControllerTest {
     }
 
     /**
-     * Verifica el comportamiento del sistema ante un intento de acceso de un usuario
-     * que no existe en los registros de la base de datos.
+     * Verifies the system's behavior in the event of an access attempt by a user
+     * that does not exist in the database records.
      */
     @Test
     void loginReturnsNotFoundWhenCredentialsAreWrong() throws Exception {

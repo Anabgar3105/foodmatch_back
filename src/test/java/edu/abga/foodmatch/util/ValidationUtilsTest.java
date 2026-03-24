@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Suite de pruebas unitarias puras para la clase {@link ValidationUtils}
+ * Unit test suite for the {@link ValidationUtils} class
  */
 public class ValidationUtilsTest {
 
     /**
-     * Verifica el flujo de éxito de las validaciones.
+     * Verifies the success flow of the validations.
      */
     @Test
     void validateRegistrationDataSuccess() {
@@ -21,7 +21,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la correcta validación del formato del correo electrónico.
+     * Verifies the correct validation of the email format.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenEmailIsInvalid() {
@@ -32,7 +32,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la correcta validación de la longitud mínima de la contraseña.
+     * Verifies the correct validation of the minimum password length.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenPasswordIsTooShort() {
@@ -43,7 +43,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la correcta validación de la presencia de al menos una mayúscula.
+     * Verifies the correct validation of the presence of at least one uppercase letter.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenPasswordLacksUppercase() {
@@ -55,7 +55,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la correcta validación de la presencia de al menos un caracter numérico.
+     * Verifies the correct validation of the presence of at least one numeric character.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenPasswordLacksNumber() {
@@ -67,7 +67,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la integridad de la petición general.
+     * Verifies the integrity of the general request.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenDtoIsNull() {
@@ -77,7 +77,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la protección contra campos obligatorios que contienen únicamente espacios.
+     * Verifies the protection against mandatory fields that contain only spaces.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenMandatoryFieldIsBlank() {
@@ -89,7 +89,7 @@ public class ValidationUtilsTest {
     }
 
     /**
-     * Verifica la protección contra objetos DTO incompletos.
+     * Verifies the protection against incomplete DTO objects.
      */
     @Test
     void validateRegistrationDataThrowsExceptionWhenMandatoryFieldsAreMissing() {

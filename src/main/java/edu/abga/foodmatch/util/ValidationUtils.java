@@ -5,14 +5,14 @@ import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import org.springframework.http.HttpStatus;
 
 /**
- * Clase de utilidad para centralizar las validaciones manuales de los DTOs.
+ * Utility class to centralize manual DTO validations.
  */
 public class ValidationUtils {
 
     /**
-     * Valida que los campos obligatorios del registro estén presentes y sean correctos.
-     * @param dto DTO con los datos de registro.
-     * @throws FoodMatchException si alguna validación falla.
+     * Validates that the mandatory registration fields are present and correct.
+     * @param dto DTO with the registration data.
+     * @throws FoodMatchException if any validation fails.
      */
     public static void validateRegistrationData(UserRegistrationDto dto) {
         if (dto == null) {
@@ -34,7 +34,7 @@ public class ValidationUtils {
     }
 
     /**
-     * Valida que la contraseña cumpla con los requisitos mínimos de seguridad.
+     * Validates that the password meets the minimum security requirements.
      */
     public static void validatePasswordStrength(String password) {
         if (password.length() < 8) {
@@ -49,7 +49,7 @@ public class ValidationUtils {
     }
 
     /**
-     * Method auxiliar para comprobar si un String es nulo o está compuesto solo por espacios.
+     * Helper method to check if a String is null or consists only of spaces.
      */
     private static boolean isNullOrBlank(String str) {
         return str == null || str.trim().isEmpty() || str.isBlank();

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controlador REST para la gestión de usuarios.
- * Expone los endpoints para el registro y gestión de perfiles.
+ * REST controller for user management.
+ * Exposes endpoints for registration and profile management.
  */
 @RestController
 @RequestMapping("/api/users")
@@ -27,10 +27,10 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * Endpoint para el registro de nuevos usuarios.
+     * Endpoint for new user registration.
      *
-     * @param registrationDto Objeto con la información del registro enviada en el cuerpo de la petición.
-     * @return ResponseEntity con el DTO del usuario creado y el estado HTTP 201.
+     * @param registrationDto Object with the registration information sent in the request body.
+     * @return ResponseEntity with the DTO of the created user and HTTP status 201.
      */
     @PostMapping("/signup")
     @Operation(summary = "Registrar un nuevo usuario", description = "Crea un usuario en la base de datos y devuelve su perfil sin la contraseña")
@@ -40,10 +40,10 @@ public class UserController {
     }
 
     /**
-     * Endpoint para el inicio de sesión de los usuarios.
+     * Endpoint for user login.
      *
-     * @param loginDto Objeto que contiene el nombre de usuario y la contraseña en texto plano.
-     * @return ResponseEntity con los datos públicos del perfil del usuario si las credenciales son correctas.
+     * @param loginDto Object containing the username and password in plain text.
+     * @return ResponseEntity with the public data of the user's profile if the credentials are correct.
      */
     @Operation(summary = "Login de usuario", description = "Verifica credenciales y devuelve los datos del perfil")
     @PostMapping("/login")
