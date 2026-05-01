@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Servicio encargado de gestionar las notificaciones y comunicaciones
- * automáticas del sistema.
+ * Service responsible for managing automated notifications
+ * and system communications.
  */
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class NotificationService {
     private final RecipeRepository recipeRepository;
 
     /**
-     * Tarea programada que orquesta la campaña "Receta del Fin de Semana".
+     * Scheduled task that orchestrates the "Weekend Recipe" campaign.
      */
     @Scheduled(fixedRate = 60000)
     @Transactional(readOnly = true)
@@ -56,10 +56,10 @@ public class NotificationService {
     }
 
     /**
-     * Procesa y envía un lote de notificaciones de forma paralela y asíncrona.
+     * Processes and sends a notification batch asynchronously in parallel.
      *
-     * @param usersBatch Lista subconjunto de usuarios destinatarios de este lote.
-     * @param recipe     La receta destacada que se incluirá en el cuerpo del mensaje.
+     * @param usersBatch Subset of recipient users in this batch.
+     * @param recipe Featured recipe included in the message body.
      */
     @Async("notificationTaskExecutor")
     public void sendEmailBatchAsync(List<User> usersBatch, Recipe recipe) {

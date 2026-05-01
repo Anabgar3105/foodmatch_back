@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * Entidad que representa una receta de cocina en el sistema.
- * Contiene la información básica del plato y la relación con su autor.
+ * Entity that represents a cooking recipe in the system.
+ * Contains the dish's basic information and its relationship with the author.
  */
 @Entity
 @Table(name = "recipes")

@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entidad que representa un ingrediente asociado a una receta.
+ * Entity that represents an ingredient associated with a recipe.
  */
 @Entity
 @Table(name = "ingredients")

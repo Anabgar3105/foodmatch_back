@@ -2,6 +2,7 @@ package edu.abga.foodmatch.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.abga.foodmatch.exception.FoodMatchException;
+import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
 import edu.abga.foodmatch.service.RecipeService;
 import edu.abga.foodmatch.util.UtilsForTests;
@@ -17,9 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -75,11 +76,13 @@ class RecipeControllerTest {
     }
 
     /**
-     * Verifies the correct functioning of the general recipe listing endpoint.
+     * Verifies the correct functioning of the general recipe listing endpoint
+     * applying the user privacy filter.
      */
     @Test
     void getAllRecipesReturnsOkStatusAndJsonArray() throws Exception {
-        when(recipeService.getAllRecipes()).thenReturn(List.of(UtilsForTests.recipeDetailDto()));
+        when(recipeService.getRecipesForUser(anyLong()))
+                .thenReturn(List.of(UtilsForTests.recipeDetailDto()));
 
         mockMvc.perform(get("/api/recipes")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -93,14 +96,44 @@ class RecipeControllerTest {
      */
     @Test
     void searchRecipesReturnsOkStatusAndFiltersCorrectly() throws Exception {
-        when(recipeService.searchRecipes("Cena", 30)).thenReturn(List.of(UtilsForTests.recipeCardDto()));
+        when(recipeService.searchRecipes(RecipeCategory.PLATOS_COMPLETOS, 30, 1L)).thenReturn(List.of(UtilsForTests.recipeCardDto()));
 
         mockMvc.perform(get("/api/recipes/search")
-                        .param("category", "Cena")
+                        .param("category", "PLATOS_COMPLETOS")
                         .param("maxTime", "30")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].title").value("Tortilla de Patatas"));
+    }
+
+    /**
+     * Verifies the success flow when deleting a recipe, expecting an HTTP 204 No Content status.
+     * This implies the user had the correct permissions (Owner or Admin).
+     */
+    @Test
+    void deleteRecipeReturnsNoContentStatus() throws Exception {
+        doNothing().when(recipeService).deleteRecipe(anyLong(), anyLong());
+
+        mockMvc.perform(delete("/api/recipes/1"))
+                .andExpect(status().isNoContent());
+
+        verify(recipeService).deleteRecipe(anyLong(), anyLong());
+    }
+
+    /**
+     * Verifies that the controller correctly maps the security exception to an HTTP 403 Forbidden
+     * when the service rejects the deletion due to lack of permissions.
+     */
+    @Test
+    void deleteRecipeReturnsForbiddenWhenNoPermissions() throws Exception {
+        doThrow(new FoodMatchException("No tienes permisos para borrar esta receta", HttpStatus.FORBIDDEN))
+                .when(recipeService).deleteRecipe(anyLong(), anyLong());
+
+        mockMvc.perform(delete("/api/recipes/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("No tienes permisos para borrar esta receta"))
+                .andExpect(jsonPath("$.status").value(403));
     }
 }

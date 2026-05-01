@@ -1,6 +1,7 @@
 package edu.abga.foodmatch.util;
 
 import edu.abga.foodmatch.model.Recipe;
+import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.User;
 import edu.abga.foodmatch.model.dto.*;
 
@@ -89,7 +90,7 @@ public class UtilsForTests {
                 .title("Tortilla de Patatas")
                 .description("Receta clásica")
                 .preparationTime(30)
-                .category("Cena")
+                .category(RecipeCategory.PLATOS_COMPLETOS)
                 .ingredients(new java.util.ArrayList<>()) // Lista inicializada
                 .steps(new java.util.ArrayList<>())       // Lista inicializada
                 .build();

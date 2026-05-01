@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entidad que representa un paso numerado en la elaboración de una receta.
+ * Entity that represents a numbered step in a recipe preparation.
  */
 @Entity
 @Table(name = "elaboration_steps")

@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entidad que representa a un usuario dentro del sistema FoodMatch.
- * Almacena la información de perfil, credenciales y rol de acceso.
+ * Entity that represents a user within the FoodMatch system.
+ * Stores profile information, credentials, and access role.
  */
 @Entity
 @Table(name = "users")

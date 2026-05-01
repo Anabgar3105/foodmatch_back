@@ -1,34 +1,44 @@
 package edu.abga.foodmatch.repository;
 
 import edu.abga.foodmatch.model.Recipe;
+import edu.abga.foodmatch.model.RecipeCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Repositorio para la entidad Recipe.
- * Proporciona los métodos para realizar operaciones CRUD y consultas personalizadas
- * sobre la tabla de recetas en la base de datos de FoodMatch.
+ * Repository for the Recipe entity.
+ * Provides methods for CRUD operations and custom queries
+ * on the recipes table in the FoodMatch database.
  */
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     /**
-     * Busca y devuelve una lista de recetas que coinciden con una categoría específica,
-     * ignorando mayúsculas y minúsculas.
-     *
-     * @param category La categoría por la que filtrar (ej. "Desayuno", "Cena").
-     * @return Lista de recetas que pertenecen a dicha categoría.
+     * Finds public recipes (where user is null) or recipes that belong to the specified user ID.
      */
-    List<Recipe> findByCategoryIgnoreCase(String category);
+    @Query("SELECT r FROM Recipe r WHERE r.user IS NULL OR r.user.id = :userId")
+    List<Recipe> findRecipes(@Param("userId") Long userId);
 
     /**
-     * Busca y devuelve una lista de recetas cuyo tiempo de preparación sea
-     * menor o igual al tiempo especificado. Muy útil para filtros de "recetas rápidas".
-     *
-     * @param maxMinutes El tiempo máximo de preparación en minutos.
-     * @return Lista de recetas que cumplen con el criterio de tiempo.
+     * Finds a specific recipe by id as long as is public or belongs to the specific user.
      */
-    List<Recipe> findByPreparationTimeLessThanEqual(Integer maxMinutes);
+    @Query("SELECT r FROM Recipe r WHERE r.id = :id AND (r.user IS NULL OR r.user.id = :userId)")
+    Optional<Recipe> findRecipeById(@Param("id") Long id, @Param("userId") Long userId);
+
+    /**
+     * Busca por categoría asegurando que la receta sea pública o del usuario.
+     */
+    @Query("SELECT r FROM Recipe r WHERE r.category = :category AND (r.user IS NULL OR r.user.id = :userId)")
+    List<Recipe> findByCategory(@Param("category") RecipeCategory category, @Param("userId") Long userId);
+
+    /**
+     * Busca por tiempo máximo asegurando que la receta sea pública o del usuario.
+     */
+    @Query("SELECT r FROM Recipe r WHERE r.preparationTime <= :maxMinutes AND (r.user IS NULL OR r.user.id = :userId)")
+    List<Recipe> findByMaxTime(@Param("maxMinutes") Integer maxMinutes, @Param("userId") Long userId);
 }

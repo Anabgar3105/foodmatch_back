@@ -7,42 +7,42 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * Repositorio para la entidad User.
- * Gestiona el acceso a los datos de los usuarios, siendo fundamental para
- * los procesos de autenticación y registro (Login/Sign Up).
+ * Repository for the User entity.
+ * Manages data access for users and is key to authentication
+ * and registration processes (Login/Sign Up).
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Busca un usuario en la base de datos mediante su dirección de correo electrónico.
+     * Finds a user by email address.
      *
-     * @param email El correo electrónico exacto del usuario.
-     * @return Un objeto Optional que contiene el usuario si se encuentra, o vacío si no existe.
+     * @param email Exact user email address.
+     * @return An Optional containing the user if found, or empty if not found.
      */
     Optional<User> findByEmail(String email);
 
     /**
-     * Busca un usuario en la base de datos mediante su nombre de usuario.
+     * Finds a user by username.
      *
-     * @param username El nombre de usuario (username) único.
-     * @return Un objeto Optional que contiene el usuario si se encuentra, o vacío si no existe.
+     * @param username Unique username.
+     * @return An Optional containing the user if found, or empty if not found.
      */
     Optional<User> findByUsername(String username);
 
     /**
-     * Comprueba si ya existe un usuario registrado en el sistema con un email determinado.
+     * Checks whether a user with the given email already exists.
      *
-     * @param email El correo electrónico a verificar.
-     * @return true si el email ya está en uso, false en caso contrario.
+     * @param email Email address to verify.
+     * @return true if the email is already in use, false otherwise.
      */
     boolean existsByEmail(String email);
 
     /**
-     * Comprueba si ya existe un usuario registrado en el sistema con un username determinado.
+     * Checks whether a user with the given username already exists.
      *
-     * @param username El nombre de usuario a verificar.
-     * @return true si el username ya está en uso, false en caso contrario.
+     * @param username Username to verify.
+     * @return true if the username is already in use, false otherwise.
      */
     boolean existsByUsername(String username);
 }

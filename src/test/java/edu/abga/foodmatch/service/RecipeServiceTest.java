@@ -2,10 +2,13 @@ package edu.abga.foodmatch.service;
 
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.Recipe;
+import edu.abga.foodmatch.model.RecipeCategory;
+import edu.abga.foodmatch.model.User;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
 import edu.abga.foodmatch.model.mapper.RecipeMapper;
 import edu.abga.foodmatch.repository.RecipeRepository;
+import edu.abga.foodmatch.repository.UserRepository;
 import edu.abga.foodmatch.util.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +36,9 @@ class RecipeServiceTest {
 
     @Mock
     private RecipeMapper recipeMapper;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private RecipeService recipeService;
@@ -99,18 +105,18 @@ class RecipeServiceTest {
      */
     @Test
     void searchRecipesByCategorySuccess() {
-        String targetCategory = "Cena";
+        RecipeCategory targetCategory = RecipeCategory.PLATOS_COMPLETOS;
         List<Recipe> mockDbResult = List.of(UtilsForTests.recipeEntity());
 
-        when(recipeRepository.findByCategoryIgnoreCase(targetCategory)).thenReturn(mockDbResult);
+        when(recipeRepository.findByCategory(targetCategory,1L)).thenReturn(mockDbResult);
         when(recipeMapper.toCardDto(any(Recipe.class))).thenReturn(UtilsForTests.recipeCardDto());
 
-        List<RecipeCardDto> results = recipeService.searchRecipes(targetCategory, null);
+        List<RecipeCardDto> results = recipeService.searchRecipes(targetCategory, null,1L);
 
         assertNotNull(results);
         assertEquals(1, results.size());
         assertEquals("Tortilla de Patatas", results.get(0).getTitle());
-        verify(recipeRepository).findByCategoryIgnoreCase(targetCategory);
+        verify(recipeRepository).findByCategory(targetCategory,1L);
     }
 
     /**
@@ -122,27 +128,141 @@ class RecipeServiceTest {
         Integer maxTime = 30;
         List<Recipe> mockDbResult = List.of(UtilsForTests.recipeEntity());
 
-        when(recipeRepository.findByPreparationTimeLessThanEqual(maxTime)).thenReturn(mockDbResult);
+        when(recipeRepository.findByMaxTime(maxTime,1L)).thenReturn(mockDbResult);
         when(recipeMapper.toCardDto(any(Recipe.class))).thenReturn(UtilsForTests.recipeCardDto());
 
-        List<RecipeCardDto> results = recipeService.searchRecipes(null, maxTime);
+        List<RecipeCardDto> results = recipeService.searchRecipes(null, maxTime,1L);
 
         assertFalse(results.isEmpty());
-        verify(recipeRepository).findByPreparationTimeLessThanEqual(maxTime);
+        verify(recipeRepository).findByMaxTime(maxTime,1L);
     }
 
     /**
-     * Verifies that when invoking the retrieval of the complete catalog,
-     * the service retrieves all records without applying filters.
+     * Verifies that when invoking the retrieval of the catalog for a specific user,
+     * the service retrieves the public records and the user's private records.
      */
     @Test
-    void getAllRecipesReturnsFullList() {
-        when(recipeRepository.findAll()).thenReturn(List.of(UtilsForTests.recipeEntity()));
-        when(recipeMapper.toDetailDto(any(Recipe.class))).thenReturn(UtilsForTests.recipeDetailDto());
+    void getRecipesForUserReturnsFilteredList() {
+        Long testUserId = 1L;
 
-        List<RecipeDetailDto> results = recipeService.getAllRecipes();
+        when(recipeRepository.findRecipes(testUserId))
+                .thenReturn(List.of(UtilsForTests.recipeEntity()));
+        when(recipeMapper.toDetailDto(any(Recipe.class)))
+                .thenReturn(UtilsForTests.recipeDetailDto());
+
+        List<RecipeDetailDto> results = recipeService.getRecipesForUser(testUserId);
 
         assertEquals(1, results.size());
-        verify(recipeRepository).findAll();
+        verify(recipeRepository).findRecipes(testUserId);
+    }
+
+    /**
+     * Verifies that the service retrieves the recipe detail when the user
+     * has permissions (public recipe or owner).
+     */
+    @Test
+    void getRecipeByIdReturnsDetailDtoWhenFound() {
+        Long recipeId = 1L;
+        Long userId = 1L;
+        Recipe mockEntity = UtilsForTests.recipeEntity();
+
+        when(recipeRepository.findRecipeById(recipeId, userId)).thenReturn(java.util.Optional.of(mockEntity));
+        when(recipeMapper.toDetailDto(any(Recipe.class))).thenReturn(UtilsForTests.recipeDetailDto());
+
+        RecipeDetailDto result = recipeService.getRecipeById(recipeId, userId);
+
+        assertNotNull(result);
+        assertEquals("Tortilla de Patatas", result.getTitle());
+        verify(recipeRepository).findRecipeById(recipeId, userId);
+    }
+
+    /**
+     * Verifies that a 404 Not Found exception is thrown when the recipe
+     * does not exist or belongs to another user.
+     */
+    @Test
+    void getRecipeByIdThrowsExceptionWhenNotFoundOrPrivate() {
+        Long recipeId = 1L;
+        Long userId = 1L;
+
+        when(recipeRepository.findRecipeById(recipeId, userId)).thenReturn(java.util.Optional.empty());
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.getRecipeById(recipeId, userId));
+
+        assertEquals("Receta no encontrada", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
+
+    /**
+     * Verifies that a recipe is successfully deleted when the requesting user
+     * is the original creator (owner) of the recipe.
+     */
+    @Test
+    void deleteRecipeSuccessWhenUserIsOwner() {
+        Long recipeId = 1L;
+        Long currentUserId = 1L;
+
+        User mockOwner = UtilsForTests.userEntity();
+        mockOwner.setId(currentUserId);
+
+        Recipe mockRecipe = UtilsForTests.recipeEntity();
+        mockRecipe.setUser(mockOwner);
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.of(mockRecipe));
+        when(userRepository.findById(currentUserId)).thenReturn(java.util.Optional.of(mockOwner));
+
+        assertDoesNotThrow(() -> recipeService.deleteRecipe(recipeId, currentUserId));
+        verify(recipeRepository).delete(mockRecipe);
+    }
+
+    /**
+     * Verifies that a recipe (even a public one without an owner) is successfully
+     * deleted when the requesting user has the ADMIN role.
+     */
+    @Test
+    void deleteRecipeSuccessWhenUserIsAdmin() {
+        Long recipeId = 1L;
+        Long currentUserId = 2L;
+
+        User mockAdmin = UtilsForTests.userEntity();
+        mockAdmin.setId(currentUserId);
+        mockAdmin.setRole(edu.abga.foodmatch.model.Role.ADMIN); // Le damos rol de Admin
+
+        Recipe mockPublicRecipe = UtilsForTests.recipeEntity();
+        mockPublicRecipe.setUser(null); // Receta pública (sin dueño)
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.of(mockPublicRecipe));
+        when(userRepository.findById(currentUserId)).thenReturn(java.util.Optional.of(mockAdmin));
+
+        assertDoesNotThrow(() -> recipeService.deleteRecipe(recipeId, currentUserId));
+        verify(recipeRepository).delete(mockPublicRecipe);
+    }
+
+    /**
+     * Verifies that a 403 Forbidden exception is thrown and the deletion is aborted
+     * when a standard user tries to delete a recipe they do not own (e.g., a public recipe).
+     */
+    @Test
+    void deleteRecipeThrowsExceptionWhenNotOwnerOrAdmin() {
+        Long recipeId = 1L;
+        Long currentUserId = 1L;
+
+        User mockStandardUser = UtilsForTests.userEntity();
+        mockStandardUser.setId(currentUserId);
+        mockStandardUser.setRole(edu.abga.foodmatch.model.Role.USER);
+
+        Recipe mockPublicRecipe = UtilsForTests.recipeEntity();
+        mockPublicRecipe.setUser(null); // Receta pública, no es suya
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.of(mockPublicRecipe));
+        when(userRepository.findById(currentUserId)).thenReturn(java.util.Optional.of(mockStandardUser));
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.deleteRecipe(recipeId, currentUserId));
+
+        assertEquals("No tienes permisos para borrar esta receta", exception.getMessage());
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        verify(recipeRepository, never()).delete(any(Recipe.class));
     }
 }

@@ -1,8 +1,10 @@
 package edu.abga.foodmatch.controller;
 
+import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
 import edu.abga.foodmatch.service.RecipeService;
+import edu.abga.foodmatch.util.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,8 @@ public class RecipeController {
     @GetMapping
     @Operation(summary = "Listar recetas", description = "Obtiene todas las recetas disponibles")
     public List<RecipeDetailDto> getAll() {
-        return recipeService.getAllRecipes();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return recipeService.getRecipesForUser(currentUserId);
     }
 
     /**
@@ -59,10 +62,29 @@ public class RecipeController {
     @GetMapping("/search")
     @Operation(summary = "Buscar recetas", description = "Filtra recetas por categoría o por tiempo de preparación máximo")
     public ResponseEntity<List<RecipeCardDto>> searchRecipes(
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) RecipeCategory category,
             @RequestParam(required = false) Integer maxTime) {
 
-        List<RecipeCardDto> results = recipeService.searchRecipes(category, maxTime);
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        List<RecipeCardDto> results = recipeService.searchRecipes(category, maxTime, currentUserId);
+
         return ResponseEntity.ok(results);
+    }
+
+    /**
+     * Endpoint to delete a specific recipe.
+     * Requires ownership of the recipe or ADMIN role.
+     *
+     * @param id The unique identifier of the recipe to delete.
+     * @return ResponseEntity with HTTP status 204 (No Content).
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Borrar receta", description = "Elimina una receta si el usuario es su creador o si tiene rol de administrador")
+    public ResponseEntity<Void> deleteRecipe(@PathVariable Long id) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        recipeService.deleteRecipe(id, currentUserId);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -2,8 +2,8 @@
 -- LIMPIEZA PREVIA (Solo para entorno de desarrollo)
 -- ==============================================================================
 DROP TABLE IF EXISTS favourites;
-DROP TABLE IF EXISTS ingredient;
-DROP TABLE IF EXISTS elaboration_step;
+DROP TABLE IF EXISTS ingredients;
+DROP TABLE IF EXISTS elaboration_steps;
 DROP TABLE IF EXISTS recipes;
 DROP TABLE IF EXISTS users;
 
@@ -37,16 +37,16 @@ CREATE TABLE IF NOT EXISTS recipes (
     );
 
 -- 3. Tabla de Ingredientes (Depende de recipes)
-CREATE TABLE IF NOT EXISTS ingredient (
+CREATE TABLE IF NOT EXISTS ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     quantity VARCHAR(100) NOT NULL,
     recipe_id BIGINT NOT NULL,
-    CONSTRAINT fk_ingredient_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+    CONSTRAINT fk_ingredients_recipe FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
     );
 
 -- 4. Tabla de Pasos de Elaboración (Depende de recipes)
-CREATE TABLE IF NOT EXISTS elaboration_step (
+CREATE TABLE IF NOT EXISTS elaboration_steps (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     step_number INT NOT NULL,
     instruction TEXT NOT NULL,
