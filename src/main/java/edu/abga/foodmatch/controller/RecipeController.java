@@ -52,6 +52,22 @@ public class RecipeController {
     }
 
     /**
+     * Endpoint to retrieve the complete details of a specific recipe.
+     * Uses the authenticated user's ID to ensure privacy (only public or owned recipes are returned).
+     *
+     * @param id The unique identifier of the recipe.
+     * @return ResponseEntity with the complete RecipeDetailDto.
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener detalle de receta", description = "Obtiene toda la información (ingredientes y pasos) de una receta específica")
+    public ResponseEntity<RecipeDetailDto> getRecipeById(@PathVariable("id") Long id) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        RecipeDetailDto recipeDetail = recipeService.getRecipeById(id, currentUserId);
+
+        return ResponseEntity.ok(recipeDetail);
+    }
+
+    /**
      * Endpoint to search and filter recipes in the catalog.
      * Allows combining optional search parameters.
      *

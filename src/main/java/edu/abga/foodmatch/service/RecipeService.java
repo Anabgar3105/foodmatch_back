@@ -79,7 +79,6 @@ public class RecipeService {
         List<Recipe> entities;
 
         if (category != null && maxTime != null) {
-            // Busca por categoría (segura) y luego filtra en Java por tiempo
             entities = recipeRepository.findByCategory(category, currentUserId).stream()
                     .filter(r -> r.getPreparationTime() != null && r.getPreparationTime() <= maxTime)
                     .collect(Collectors.toList());
@@ -99,8 +98,8 @@ public class RecipeService {
      * Get a specific recipe by id
      * @param id of the recipe to retrieve
      * @param currentUserId The ID of the authenticated user making the request.
-      * @return RecipeDetailDto with the complete information of the recipe.
-      * @throws FoodMatchException if the recipe is not found or the user does not have permissions to view it.
+     * @return RecipeDetailDto with the complete information of the recipe.
+     * @throws FoodMatchException if the recipe is not found or the user does not have permissions to view it.
      */
     @Transactional(readOnly = true)
     public RecipeDetailDto getRecipeById(Long id, Long currentUserId) {

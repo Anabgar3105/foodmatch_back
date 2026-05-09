@@ -92,6 +92,20 @@ class RecipeControllerTest {
     }
 
     /**
+     * Verifies the successful retrieval of a single recipe's details via its ID.
+     */
+    @Test
+    void getRecipeByIdReturnsOkStatusAndRecipeDetail() throws Exception {
+        when(recipeService.getRecipeById(anyLong(), anyLong()))
+                .thenReturn(UtilsForTests.recipeDetailDto());
+
+        mockMvc.perform(get("/api/recipes/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Tortilla de Patatas"));
+    }
+
+    /**
      * Verifies that the search endpoint correctly processes the query parameters (Query Params).
      */
     @Test
