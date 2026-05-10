@@ -9,6 +9,7 @@ import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import edu.abga.foodmatch.model.dto.UserResponseDto;
 import edu.abga.foodmatch.model.mapper.UserMapper;
 import edu.abga.foodmatch.repository.UserRepository;
+import edu.abga.foodmatch.security.JwtUtil;
 import edu.abga.foodmatch.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     /**
      * Processes the registration of a new user in the system.
@@ -68,6 +70,11 @@ public class UserService {
             throw new FoodMatchException("Credenciales incorrectas", HttpStatus.UNAUTHORIZED);
         }
 
-        return userMapper.toResponseDto(user);
+        UserResponseDto response = userMapper.toResponseDto(user);
+
+        String token = jwtUtil.generateToken(user.getUsername());
+        response.setToken(token);
+
+        return response;
     }
 }

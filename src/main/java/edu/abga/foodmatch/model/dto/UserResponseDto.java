@@ -23,4 +23,5 @@ public class UserResponseDto {
     private String email;
     private String username;
     private LocalDateTime registerDate;
+    private String token;
 }

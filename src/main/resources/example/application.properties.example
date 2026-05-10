@@ -16,5 +16,9 @@ server.port=8080
 
 logging.level.org.springframework.security=INFO
 
+# Genera una cadena aleatoria larga (mínimo 32 caracteres) codificada en Base64 para usar como secreto JWT.
+jwt.secret=PON_AQUI_TU_SECRETO
+jwt.expiration=86400000
+
 springdoc.swagger-ui.path=/swagger-ui.html
 springdoc.api-docs.path=/v3/api-docs

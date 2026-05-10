@@ -6,6 +6,7 @@ import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import edu.abga.foodmatch.model.dto.UserResponseDto;
 import edu.abga.foodmatch.model.mapper.UserMapper;
 import edu.abga.foodmatch.repository.UserRepository;
+import edu.abga.foodmatch.security.JwtUtil;
 import edu.abga.foodmatch.util.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,9 @@ class UserServiceTest {
 
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private UserService userService;
@@ -112,6 +116,7 @@ class UserServiceTest {
         when(userRepository.findByUsername("d.redondo")).thenReturn(Optional.of(UtilsForTests.userEntity()));
         when(passwordEncoder.matches("1234", "hashedSecreta")).thenReturn(true);
         when(userMapper.toResponseDto(UtilsForTests.userEntity())).thenReturn(UtilsForTests.userResponseDto());
+        when(jwtUtil.generateToken(anyString())).thenReturn("token");
 
         UserResponseDto result = userService.login(UtilsForTests.loginDto());
 
