@@ -2,14 +2,18 @@ package edu.abga.foodmatch.config;
 
 import edu.abga.foodmatch.model.User;
 import edu.abga.foodmatch.repository.UserRepository;
+import edu.abga.foodmatch.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.List;
 
 /**
  * Application-level security bean configuration.
@@ -34,13 +38,14 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService() {
         return username -> {
             User myUser = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-            return org.springframework.security.core.userdetails.User.builder()
-                    .username(myUser.getUsername())
-                    .password(myUser.getPassword())
-                    .roles(myUser.getRole().name())
-                    .build();
+            return new CustomUserDetails(
+                    myUser.getId(),
+                    myUser.getUsername(),
+                    myUser.getPassword(),
+                    List.of(new SimpleGrantedAuthority("ROLE_" + myUser.getRole().name()))
+            );
         };
     }
 
