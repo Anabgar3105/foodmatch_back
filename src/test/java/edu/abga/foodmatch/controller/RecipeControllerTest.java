@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import edu.abga.foodmatch.security.JwtUtil;
+
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +39,9 @@ class RecipeControllerTest {
 
     @MockitoBean
     private RecipeService recipeService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     /**
      * Verifies the success flow (Happy Path) when creating a new recipe.

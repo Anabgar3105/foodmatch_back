@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import edu.abga.foodmatch.security.JwtUtil;
+
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -30,6 +32,9 @@ class FavoriteControllerTest {
 
     @MockitoBean
     private FavoriteService favoriteService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     /**
      * Verifies the success flow when a user adds a recipe to their favorites,
