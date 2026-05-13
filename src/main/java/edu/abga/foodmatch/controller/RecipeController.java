@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.controller;
 
+import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * REST controller for managing the recipe catalog.
@@ -102,5 +104,26 @@ public class RecipeController {
         recipeService.deleteRecipe(id, currentUserId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Update the image URL of an existing recipe.
+     * @param id the ID of the recipe to update.
+     * @param body the request body containing the new image URL in the format: {"url": "new_image_url"}
+     * @return ResponseEntity with the updated RecipeDetailDto.
+     */
+    @PatchMapping("/{id}/image")
+    @Operation(summary = "Actualizar imagen de receta", description = "Actualiza la URL de la imagen de una receta existente")
+    public ResponseEntity<RecipeDetailDto> updateImage(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+
+        String imageUrl = body.get("url");
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            throw new FoodMatchException("La URL de la imagen es obligatoria", HttpStatus.BAD_REQUEST);
+        }
+
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return ResponseEntity.ok(recipeService.updateRecipeImage(id, imageUrl, currentUserId));
     }
 }

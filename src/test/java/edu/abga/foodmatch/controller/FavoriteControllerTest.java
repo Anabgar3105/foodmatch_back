@@ -1,16 +1,19 @@
 package edu.abga.foodmatch.controller;
 
+import edu.abga.foodmatch.security.WithMockCustomUser;
 import edu.abga.foodmatch.service.FavoriteService;
 import edu.abga.foodmatch.util.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import edu.abga.foodmatch.security.JwtUtil;
+import edu.abga.foodmatch.config.TestSecurityConfig;
 
 import java.util.List;
 
@@ -25,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(FavoriteController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(TestSecurityConfig.class)
 class FavoriteControllerTest {
 
     @Autowired
@@ -41,6 +45,7 @@ class FavoriteControllerTest {
      * expecting an HTTP 201 Created status.
      */
     @Test
+    @WithMockCustomUser
     void addFavoriteReturnsCreatedStatus() throws Exception {
         doNothing().when(favoriteService).addFavorite(anyLong(), anyLong());
 
@@ -55,6 +60,7 @@ class FavoriteControllerTest {
      * expecting an HTTP 204 No Content status.
      */
     @Test
+    @WithMockCustomUser
     void removeFavoriteReturnsNoContentStatus() throws Exception {
         doNothing().when(favoriteService).removeFavorite(anyLong(), anyLong());
 
@@ -69,6 +75,7 @@ class FavoriteControllerTest {
      * for the authenticated user, returning an HTTP 200 OK and a JSON array.
      */
     @Test
+    @WithMockCustomUser
     void getUserFavoritesReturnsOkAndJsonArray() throws Exception {
         when(favoriteService.getUserFavorites(anyLong())).thenReturn(List.of(UtilsForTests.recipeCardDto()));
 

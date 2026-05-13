@@ -27,7 +27,7 @@ public class ElaborationStep {
     /**
      * Step number
      */
-    @Column(name = "step_num", nullable = false)
+    @Column(name = "step_number", nullable = false)
     private Integer stepNum;
 
     /**
