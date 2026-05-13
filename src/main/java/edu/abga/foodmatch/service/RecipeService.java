@@ -132,4 +132,29 @@ public class RecipeService {
 
         recipeRepository.delete(recipe);
     }
+
+    /**
+     * Updates the image of a recipe, validating permissions.
+     * @param recipeId the recipe to update
+     * @param imageUrl the image URL to set
+     * @param currentUserId the current authenticated user ID
+     * @return RecipeDetailDto with the updated recipe information.
+     * @throws FoodMatchException if the recipe is not found, the user is not found, or the user does not have permissions to edit the recipe.
+     */
+    @Transactional
+    public RecipeDetailDto updateRecipeImage(Long recipeId, String imageUrl, Long currentUserId) {
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new FoodMatchException("Receta no encontrada", HttpStatus.NOT_FOUND));
+
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+
+        if (!recipe.getUser().getId().equals(currentUserId) && currentUser.getRole() != Role.ADMIN) {
+            throw new FoodMatchException("No tienes permiso para editar esta receta", HttpStatus.FORBIDDEN);
+        }
+
+        recipe.setImage(imageUrl);
+        Recipe savedRecipe = recipeRepository.save(recipe);
+        return recipeMapper.toDetailDto(savedRecipe);
+    }
 }
