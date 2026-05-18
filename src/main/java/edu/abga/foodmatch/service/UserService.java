@@ -99,9 +99,7 @@ public class UserService {
 
         user.setUsername(updateDto.getUsername());
         user.setEmail(updateDto.getEmail());
-        if (updateDto.getAvatarUrl() != null) {
-            user.setAvatarUrl(updateDto.getAvatarUrl());
-        }
+        user.setAvatarUrl(updateDto.getAvatarUrl());
 
         User savedUser = userRepository.save(user);
 

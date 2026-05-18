@@ -108,4 +108,55 @@ public class UtilsForTests {
                 .category("Cena")
                 .build();
     }
+
+    /**
+     * Generates a UserUpdateDto simulating profile update data with default values.
+     * @return UserUpdateDto
+     */
+    public static UserUpdateDto userUpdateDto() {
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setUsername("d.redondo.updated");
+        dto.setEmail("dredondo.updated@email.com");
+        dto.setAvatarUrl("https://avatar.updated.url");
+        return dto;
+    }
+
+    /**
+     * Generates a UserUpdateDto with specific data for testing profile updates.
+     * @param username the new username
+     * @param email the new email
+     * @param avatarUrl the new avatar URL
+     * @return UserUpdateDto with the specified data
+     */
+    public static UserUpdateDto userUpdateDto(String username, String email, String avatarUrl) {
+        UserUpdateDto dto = new UserUpdateDto();
+        dto.setUsername(username);
+        dto.setEmail(email);
+        dto.setAvatarUrl(avatarUrl);
+        return dto;
+    }
+
+    /**
+     * Generates a PasswordChangeDto simulating a password change request.
+     * @return PasswordChangeDto
+     */
+    public static PasswordChangeDto passwordChangeDto() {
+        PasswordChangeDto dto = new PasswordChangeDto();
+        dto.setCurrentPassword("Secreta123");
+        dto.setNewPassword("NewSecreta123");
+        return dto;
+    }
+
+    /**
+     * Generates a PasswordChangeDto with specific data for testing password changes.
+     * @param currentPassword the current password
+     * @param newPassword the new password
+     * @return PasswordChangeDto with the specified data
+     */
+    public static PasswordChangeDto passwordChangeDto(String currentPassword, String newPassword) {
+        PasswordChangeDto dto = new PasswordChangeDto();
+        dto.setCurrentPassword(currentPassword);
+        dto.setNewPassword(newPassword);
+        return dto;
+    }
 }

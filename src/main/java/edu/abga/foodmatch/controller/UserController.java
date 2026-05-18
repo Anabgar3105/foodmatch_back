@@ -1,9 +1,6 @@
 package edu.abga.foodmatch.controller;
 
-import edu.abga.foodmatch.model.dto.PasswordChangeDto;
-import edu.abga.foodmatch.model.dto.UserLoginDto;
-import edu.abga.foodmatch.model.dto.UserRegistrationDto;
-import edu.abga.foodmatch.model.dto.UserResponseDto;
+import edu.abga.foodmatch.model.dto.*;
 import edu.abga.foodmatch.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -63,7 +61,7 @@ public class UserController {
     @PutMapping("/profile")
     public ResponseEntity<UserResponseDto> updateProfile(
             Principal principal,
-            @Valid @RequestBody edu.abga.foodmatch.model.dto.UserUpdateDto updateDto) {
+            @Valid @RequestBody UserUpdateDto updateDto) {
 
         UserResponseDto updatedUser = userService.updateProfile(principal.getName(), updateDto);
         return ResponseEntity.ok(updatedUser);
@@ -83,7 +81,7 @@ public class UserController {
 
         userService.changePassword(principal.getName(), dto);
 
-        Map<String, String> response = new java.util.HashMap<>();
+        Map<String, String> response = new HashMap<>();
         response.put("message", "Contraseña actualizada con éxito");
 
         return ResponseEntity.ok(response);

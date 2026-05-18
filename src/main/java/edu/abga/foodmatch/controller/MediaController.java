@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +35,17 @@ public class MediaController {
     @PostMapping("/upload")
     @Operation(summary = "Subir archivo multimedia", description = "Sube cualquier imagen a Cloudinary y devuelve la URL")
     public ResponseEntity<Map<String, String>> uploadImage(
+            Principal principal,
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "folder", defaultValue = "recipes") String folder) {
 
         try {
-            String imageUrl = cloudinaryService.uploadImage(file, folder);
+            String publicId = null;
+
+            if ("avatars".equals(folder) && principal != null) {
+                publicId = principal.getName() + "_avatar";
+            }
+            String imageUrl = cloudinaryService.uploadImage(file, folder,publicId);
 
             Map<String, String> response = new HashMap<>();
             response.put("url", imageUrl);

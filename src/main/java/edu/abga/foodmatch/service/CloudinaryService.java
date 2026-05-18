@@ -26,11 +26,19 @@ public class CloudinaryService {
      * @param file Multipart file to be uploaded.
      * @return URL of the uploaded image.
      */
-    public String uploadImage(MultipartFile file, String folder) throws IOException {
+    public String uploadImage(MultipartFile file, String folder, String publicId) throws IOException {
+        Map<String, Object> options = new java.util.HashMap<>();
+        options.put("folder", "foodmatch/" + folder);
+
+        if (publicId != null) {
+            options.put("public_id", publicId);
+            options.put("overwrite", true);
+            options.put("invalidate", true);
+        }
 
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
-                ObjectUtils.asMap("folder", "foodmatch/" + folder)
+                options
         );
 
         return uploadResult.get("secure_url").toString();
