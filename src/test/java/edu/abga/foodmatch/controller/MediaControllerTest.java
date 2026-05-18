@@ -39,9 +39,9 @@ class MediaControllerTest {
     void uploadImage_ReturnsUrlOnSuccess() throws IOException {
         MultipartFile mockFile = mock(MultipartFile.class);
         String expectedUrl = "https://cloudinary.com/image.jpg";
-        when(cloudinaryService.uploadImage(mockFile)).thenReturn(expectedUrl);
+        when(cloudinaryService.uploadImage(mockFile, "recipes")).thenReturn(expectedUrl);
 
-        ResponseEntity<Map<String, String>> response = mediaController.uploadImage(mockFile);
+        ResponseEntity<Map<String, String>> response = mediaController.uploadImage(mockFile, "recipes");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -54,9 +54,9 @@ class MediaControllerTest {
     @Test
     void uploadImage_ThrowsFoodMatchExceptionOnError() throws IOException {
         MultipartFile mockFile = mock(MultipartFile.class);
-        when(cloudinaryService.uploadImage(mockFile)).thenThrow(new IOException("IO error"));
+        when(cloudinaryService.uploadImage(mockFile, "recipes")).thenThrow(new IOException("IO error"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> mediaController.uploadImage(mockFile));
+        Exception exception = assertThrows(RuntimeException.class, () -> mediaController.uploadImage(mockFile, "recipes"));
         assertTrue(exception.getMessage().contains("Error al procesar y subir la imagen"));
     }
 }

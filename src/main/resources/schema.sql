@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    register_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    register_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    avatar_url VARCHAR(255)
     );
 
 -- 2. Tabla de Recetas (EN PLURAL Y CON IMAGE Y USER_ID)

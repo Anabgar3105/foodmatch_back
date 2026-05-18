@@ -33,9 +33,12 @@ public class MediaController {
      */
     @PostMapping("/upload")
     @Operation(summary = "Subir archivo multimedia", description = "Sube cualquier imagen a Cloudinary y devuelve la URL")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "folder", defaultValue = "recipes") String folder) {
+
         try {
-            String imageUrl = cloudinaryService.uploadImage(file);
+            String imageUrl = cloudinaryService.uploadImage(file, folder);
 
             Map<String, String> response = new HashMap<>();
             response.put("url", imageUrl);
