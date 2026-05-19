@@ -267,4 +267,69 @@ class RecipeServiceTest {
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         verify(recipeRepository, never()).delete(any(Recipe.class));
     }
+
+    /**
+     * Verifies that the service successfully retrieves all recipes created by a specific user.
+     * Ensures that the repository is called with the correct user ID and the DTOs are correctly mapped.
+     */
+    @Test
+    void getMyRecipesReturnsListOfRecipeCardsForUser() {
+        String username = "d.redondo";
+        User mockUser = UtilsForTests.userEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername(username);
+
+        List<Recipe> mockRecipes = List.of(UtilsForTests.recipeEntity());
+
+        when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.of(mockUser));
+        when(recipeRepository.findByUserId(mockUser.getId())).thenReturn(mockRecipes);
+        when(recipeMapper.toCardDto(any(Recipe.class))).thenReturn(UtilsForTests.recipeCardDto());
+
+        List<RecipeCardDto> results = recipeService.getMyRecipes(username);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals("Tortilla de Patatas", results.get(0).getTitle());
+        verify(userRepository).findByUsername(username);
+        verify(recipeRepository).findByUserId(mockUser.getId());
+    }
+
+    /**
+     * Verifies that the service throws a 404 Not Found exception when trying to retrieve
+     * recipes for a user that does not exist in the system.
+     */
+    @Test
+    void getMyRecipesThrowsExceptionWhenUserNotFound() {
+        String username = "nonexistent.user";
+
+        when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.empty());
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.getMyRecipes(username));
+
+        assertEquals("Usuario no encontrado", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        verify(recipeRepository, never()).findByUserId(any());
+    }
+
+    /**
+     * Verifies that the service returns an empty list when a user has no recipes.
+     */
+    @Test
+    void getMyRecipesReturnsEmptyListWhenUserHasNoRecipes() {
+        String username = "d.redondo";
+        User mockUser = UtilsForTests.userEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername(username);
+
+        when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.of(mockUser));
+        when(recipeRepository.findByUserId(mockUser.getId())).thenReturn(List.of());
+
+        List<RecipeCardDto> results = recipeService.getMyRecipes(username);
+
+        assertNotNull(results);
+        assertTrue(results.isEmpty());
+        verify(userRepository).findByUsername(username);
+        verify(recipeRepository).findByUserId(mockUser.getId());
+    }
 }

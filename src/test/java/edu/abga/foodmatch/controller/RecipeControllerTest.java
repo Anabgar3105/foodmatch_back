@@ -192,16 +192,70 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.image").value(newImageUrl));
     }
 
-    /**
-     * Tests the PATCH /api/recipes/{id}/image endpoint when the URL is missing or empty.
-     * Expects a 400 Bad Request with the correct error message.
-     */
-    @Test
-    void updateImage_ReturnsBadRequestWhenUrlMissing() throws Exception {
-        mockMvc.perform(patch("/api/recipes/1/image")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("La URL de la imagen es obligatoria"));
-    }
+     /**
+      * Tests the PATCH /api/recipes/{id}/image endpoint when the URL is missing or empty.
+      * Expects a 400 Bad Request with the correct error message.
+      */
+     @Test
+     void updateImage_ReturnsBadRequestWhenUrlMissing() throws Exception {
+         mockMvc.perform(patch("/api/recipes/1/image")
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .content("{}"))
+                 .andExpect(status().isBadRequest())
+                 .andExpect(jsonPath("$.message").value("La URL de la imagen es obligatoria"));
+     }
+
+     /**
+      * Verifies that the getMyRecipes endpoint returns a successful response with the list of recipes
+      * created by the authenticated user.
+      */
+     @Test
+     @WithMockCustomUser
+     void getMyRecipesReturnsOkStatusAndJsonArray() throws Exception {
+         when(recipeService.getMyRecipes("d.redondo"))
+                 .thenReturn(List.of(UtilsForTests.recipeCardDto()));
+
+         mockMvc.perform(get("/api/recipes/my-recipes")
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isArray())
+                 .andExpect(jsonPath("$[0].title").value("Tortilla de Patatas"))
+                 .andExpect(jsonPath("$[0].preparationTime").value(30));
+     }
+
+     /**
+      * Verifies that the getMyRecipes endpoint returns an empty array when the user has no recipes.
+      */
+     @Test
+     @WithMockCustomUser
+     void getMyRecipesReturnsEmptyArrayWhenNoRecipes() throws Exception {
+         when(recipeService.getMyRecipes("d.redondo"))
+                 .thenReturn(List.of());
+
+         mockMvc.perform(get("/api/recipes/my-recipes")
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isArray())
+                 .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(0)));
+     }
+
+     /**
+      * Verifies that the controller returns a 404 Not Found when the user is not found
+      * in the system (edge case where the user has been deleted).
+      */
+     @Test
+     @WithMockCustomUser
+     void getMyRecipesReturnsNotFoundWhenUserDoesNotExist() throws Exception {
+         when(recipeService.getMyRecipes("d.redondo"))
+                 .thenThrow(new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+
+         mockMvc.perform(get("/api/recipes/my-recipes")
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isNotFound())
+                 .andExpect(jsonPath("$.message").value("Usuario no encontrado"))
+                 .andExpect(jsonPath("$.status").value(404));
+     }
 }

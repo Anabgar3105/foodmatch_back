@@ -161,4 +161,20 @@ public class RecipeService {
         Recipe savedRecipe = recipeRepository.save(recipe);
         return recipeMapper.toDetailDto(savedRecipe);
     }
+
+    /**
+     * Gets the recipes created by a specific user
+     * @param username the username of the user whose recipes we want to retrieve
+     * @return a list of RecipeCardDto representing the recipes created by the user.
+     */
+    public List<RecipeCardDto> getMyRecipes(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+
+        List<Recipe> myRecipes = recipeRepository.findByUserId(user.getId());
+
+        return myRecipes.stream()
+                .map(recipeMapper::toCardDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

@@ -94,6 +94,18 @@ public class RecipeController {
     }
 
     /**
+     * Endpoint to retrieve the recipes created by the authenticated user.
+     * @param principal the security principal containing the authenticated user's information
+     * @return ResponseEntity with a list of RecipeCardDto representing the user's own recipes.
+     */
+    @GetMapping("/my-recipes")
+    @Operation(summary = "Obtener mis recetas", description = "Devuelve las recetas creadas por el usuario autenticado")
+    public ResponseEntity<List<RecipeCardDto>> getMyRecipes(Principal principal) {
+        List<RecipeCardDto> myRecipes = recipeService.getMyRecipes(principal.getName());
+        return ResponseEntity.ok(myRecipes);
+    }
+
+    /**
      * Endpoint to delete a specific recipe.
      * Requires ownership of the recipe or ADMIN role.
      *
