@@ -65,7 +65,7 @@ class RecipeControllerTest {
                         .principal(() -> "d.redondo"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("Tortilla de Patatas"))
-                .andExpect(jsonPath("$.category").value("Cena"));
+                .andExpect(jsonPath("$.category").value("PLATOS_COMPLETOS"));
     }
 
     /**
@@ -257,5 +257,98 @@ class RecipeControllerTest {
                  .andExpect(status().isNotFound())
                  .andExpect(jsonPath("$.message").value("Usuario no encontrado"))
                  .andExpect(jsonPath("$.status").value(404));
+     }
+
+     /**
+      * Tests the PUT /api/recipes/{id} endpoint for successful recipe update.
+      * Verifies that the controller returns the updated RecipeDetailDto and status 200.
+      */
+     @Test
+     @WithMockCustomUser
+     void updateRecipeReturnsOkStatusAndUpdatedRecipe() throws Exception {
+         Long recipeId = 1L;
+         RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+         updateDto.setTitle("Tortilla de Patatas Actualizada");
+         updateDto.setPreparationTime(45);
+         updateDto.setCategory("PLATOS_COMPLETOS");
+
+         when(recipeService.updateRecipe(eq(recipeId), any(RecipeDetailDto.class), eq("d.redondo")))
+                 .thenReturn(updateDto);
+
+         mockMvc.perform(put("/api/recipes/{id}", recipeId)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .content(objectMapper.writeValueAsString(updateDto))
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.title").value("Tortilla de Patatas Actualizada"))
+                 .andExpect(jsonPath("$.preparationTime").value(45));
+     }
+
+     /**
+      * Tests the PUT /api/recipes/{id} endpoint when the recipe does not exist.
+      * Expects a 404 Not Found with the correct error message.
+      */
+     @Test
+     @WithMockCustomUser
+     void updateRecipeReturnsNotFoundWhenRecipeDoesNotExist() throws Exception {
+         Long recipeId = 999L;
+         RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+         updateDto.setCategory("PLATOS_COMPLETOS");
+
+         when(recipeService.updateRecipe(eq(recipeId), any(RecipeDetailDto.class), anyString()))
+                 .thenThrow(new FoodMatchException("La receta no existe", HttpStatus.NOT_FOUND));
+
+         mockMvc.perform(put("/api/recipes/{id}", recipeId)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .content(objectMapper.writeValueAsString(updateDto))
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isNotFound())
+                 .andExpect(jsonPath("$.message").value("La receta no existe"))
+                 .andExpect(jsonPath("$.status").value(404));
+     }
+
+     /**
+      * Tests the PUT /api/recipes/{id} endpoint when the user does not have permission to update the recipe.
+      * Expects a 403 Forbidden with the correct error message.
+      */
+     @Test
+     @WithMockCustomUser
+     void updateRecipeReturnsForbiddenWhenUserIsNotOwner() throws Exception {
+         Long recipeId = 1L;
+         RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+         updateDto.setCategory("PLATOS_COMPLETOS");
+
+         when(recipeService.updateRecipe(eq(recipeId), any(RecipeDetailDto.class), eq("d.redondo")))
+                 .thenThrow(new FoodMatchException("No tienes permisos para editar esta receta", HttpStatus.FORBIDDEN));
+
+         mockMvc.perform(put("/api/recipes/{id}", recipeId)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .content(objectMapper.writeValueAsString(updateDto))
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isForbidden())
+                 .andExpect(jsonPath("$.message").value("No tienes permisos para editar esta receta"))
+                 .andExpect(jsonPath("$.status").value(403));
+     }
+
+     /**
+      * Tests the PUT /api/recipes/{id} endpoint with missing required fields.
+      * Expects validation to be performed on the DTO.
+      */
+     @Test
+     @WithMockCustomUser
+     void updateRecipeWithValidation() throws Exception {
+         Long recipeId = 1L;
+         RecipeDetailDto updateDto = new RecipeDetailDto();
+         updateDto.setTitle(""); // Empty title should fail validation if @NotBlank is applied
+         updateDto.setCategory("PLATOS_COMPLETOS");
+
+         when(recipeService.updateRecipe(eq(recipeId), any(RecipeDetailDto.class), eq("d.redondo")))
+                 .thenReturn(UtilsForTests.recipeDetailDto());
+
+         mockMvc.perform(put("/api/recipes/{id}", recipeId)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .content(objectMapper.writeValueAsString(updateDto))
+                         .principal(() -> "d.redondo"))
+                 .andExpect(status().isOk());
      }
 }

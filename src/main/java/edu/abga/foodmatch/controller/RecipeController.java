@@ -8,6 +8,7 @@ import edu.abga.foodmatch.service.RecipeService;
 import edu.abga.foodmatch.util.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -103,6 +104,25 @@ public class RecipeController {
     public ResponseEntity<List<RecipeCardDto>> getMyRecipes(Principal principal) {
         List<RecipeCardDto> myRecipes = recipeService.getMyRecipes(principal.getName());
         return ResponseEntity.ok(myRecipes);
+    }
+
+    /**
+     * Endpoint to update an existing recipe.
+     * Only the creator of the recipe can perform this action.
+     * @param id the ID of the recipe to update
+     * @param recipeDto the DTO containing the updated recipe information
+     * @param principal the security principal containing the authenticated user's information
+     * @return ResponseEntity with the updated RecipeDetailDto if the update was successful.
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar una receta", description = "Modifica los datos de una receta existente (solo para el creador)")
+    public ResponseEntity<RecipeDetailDto> updateRecipe(
+            @PathVariable Long id,
+            @Valid @RequestBody RecipeDetailDto recipeDto,
+            Principal principal) {
+
+        RecipeDetailDto updatedRecipe = recipeService.updateRecipe(id, recipeDto, principal.getName());
+        return ResponseEntity.ok(updatedRecipe);
     }
 
     /**

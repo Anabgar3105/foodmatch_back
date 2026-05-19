@@ -67,18 +67,18 @@ public class UtilsForTests {
                 .build();
     }
 
-    /**
-     * Genera un DTO de detalle de receta para pruebas de creación.
-     * @return RecipeDetailDto
-     */
-    public static RecipeDetailDto recipeDetailDto() {
-        return RecipeDetailDto.builder()
-                .title("Tortilla de Patatas")
-                .description("Receta clásica")
-                .preparationTime(30)
-                .category("Cena")
-                .build();
-    }
+     /**
+      * Genera un DTO de detalle de receta para pruebas de creación.
+      * @return RecipeDetailDto
+      */
+     public static RecipeDetailDto recipeDetailDto() {
+         return RecipeDetailDto.builder()
+                 .title("Tortilla de Patatas")
+                 .description("Receta clásica")
+                 .preparationTime(30)
+                 .category("PLATOS_COMPLETOS")
+                 .build();
+     }
 
     /**
      * Genera una entidad Recipe simulando que viene de la base de datos.
