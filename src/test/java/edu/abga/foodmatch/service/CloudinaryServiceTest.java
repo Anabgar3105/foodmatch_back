@@ -2,7 +2,6 @@ package edu.abga.foodmatch.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Uploader;
-import com.cloudinary.utils.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -53,7 +52,7 @@ class CloudinaryServiceTest {
         uploadResult.put("secure_url", "https://cloudinary.com/test.jpg");
         when(uploader.upload(any(), anyMap())).thenReturn(uploadResult);
 
-        String url = cloudinaryService.uploadImage(multipartFile);
+        String url = cloudinaryService.uploadImage(multipartFile, "recipes", "publicId");
         assertEquals("https://cloudinary.com/test.jpg", url);
     }
 
@@ -63,7 +62,7 @@ class CloudinaryServiceTest {
     @Test
     void uploadImage_ThrowsIOException() throws IOException {
         when(multipartFile.getBytes()).thenThrow(new IOException("IO error"));
-        assertThrows(IOException.class, () -> cloudinaryService.uploadImage(multipartFile));
+        assertThrows(IOException.class, () -> cloudinaryService.uploadImage(multipartFile, "recipes", "publicId"));
     }
 }
 

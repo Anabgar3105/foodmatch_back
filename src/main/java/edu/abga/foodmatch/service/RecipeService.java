@@ -34,7 +34,7 @@ public class RecipeService {
      * @throws FoodMatchException if the recipe data is invalid.
      */
     @Transactional
-    public RecipeDetailDto createRecipe(RecipeDetailDto dto) {
+    public RecipeDetailDto createRecipe(RecipeDetailDto dto, String username) {
         if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
             throw new FoodMatchException("El título de la receta es obligatorio", HttpStatus.BAD_REQUEST);
         }
@@ -43,7 +43,11 @@ public class RecipeService {
             throw new FoodMatchException("El tiempo de preparación no puede ser negativo", HttpStatus.BAD_REQUEST);
         }
 
+        User creator = userRepository.findByUsername(username)
+                .orElseThrow(() -> new FoodMatchException("Usuario creador no encontrado", HttpStatus.NOT_FOUND));
+
         Recipe recipe = recipeMapper.toEntity(dto);
+        recipe.setUser(creator);
 
         if (recipe.getIngredients() != null) {
             recipe.getIngredients().forEach(ingredient -> ingredient.setRecipe(recipe));

@@ -74,6 +74,12 @@ public class User {
     private Role role;
 
     /**
+     * Avatar URL
+     */
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    /**
      * RegisterDate
      */
     @CreationTimestamp

@@ -56,12 +56,13 @@ class RecipeControllerTest {
     void createRecipeReturnsCreatedStatusAndRecipeDetail() throws Exception {
         RecipeDetailDto inputDto = UtilsForTests.recipeDetailDto();
 
-        when(recipeService.createRecipe(any(RecipeDetailDto.class)))
+        when(recipeService.createRecipe(any(RecipeDetailDto.class),anyString()))
                 .thenReturn(UtilsForTests.recipeDetailDto());
 
         mockMvc.perform(post("/api/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inputDto)))
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .principal(() -> "d.redondo"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("Tortilla de Patatas"))
                 .andExpect(jsonPath("$.category").value("Cena"));
@@ -76,12 +77,13 @@ class RecipeControllerTest {
     void createRecipeReturnsBadRequestWhenNoRecipeTitle() throws Exception {
         RecipeDetailDto inputDto = RecipeDetailDto.builder().build();
 
-        when(recipeService.createRecipe(any(RecipeDetailDto.class)))
+        when(recipeService.createRecipe(any(RecipeDetailDto.class), anyString()))
                 .thenThrow(new FoodMatchException("El título de la receta es obligatorio", HttpStatus.BAD_REQUEST));
 
         mockMvc.perform(post("/api/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inputDto)))
+                        .content(objectMapper.writeValueAsString(inputDto))
+                        .principal(() -> "d.redondo"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("El título de la receta es obligatorio"))
                 .andExpect(jsonPath("$.status").value(400));

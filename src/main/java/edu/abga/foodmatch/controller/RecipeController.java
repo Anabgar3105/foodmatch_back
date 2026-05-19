@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +38,11 @@ public class RecipeController {
      */
     @PostMapping
     @Operation(summary = "Crear receta", description = "Guarda una receta con sus ingredientes y pasos")
-    public ResponseEntity<RecipeDetailDto> create(@RequestBody RecipeDetailDto dto) {
-        return new ResponseEntity<>(recipeService.createRecipe(dto), HttpStatus.CREATED);
+    public ResponseEntity<RecipeDetailDto> create(
+            @RequestBody RecipeDetailDto dto,
+            Principal principal) {
+        RecipeDetailDto createdRecipe = recipeService.createRecipe(dto, principal.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRecipe);
     }
 
     /**

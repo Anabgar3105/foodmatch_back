@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,8 +57,9 @@ class RecipeServiceTest {
         when(recipeMapper.toEntity(any(RecipeDetailDto.class))).thenReturn(mockEntity);
         when(recipeRepository.save(any(Recipe.class))).thenReturn(mockEntity);
         when(recipeMapper.toDetailDto(any(Recipe.class))).thenReturn(inputDto);
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(UtilsForTests.userEntity()));
 
-        RecipeDetailDto result = recipeService.createRecipe(inputDto);
+        RecipeDetailDto result = recipeService.createRecipe(inputDto, UtilsForTests.userEntity().getUsername());
 
         assertNotNull(result);
         assertEquals("Tortilla de Patatas", result.getTitle());
@@ -74,7 +76,7 @@ class RecipeServiceTest {
         RecipeDetailDto invalidDto = new RecipeDetailDto();
         invalidDto.setTitle("");
 
-        FoodMatchException exception = assertThrows(FoodMatchException.class, () -> recipeService.createRecipe(invalidDto));
+        FoodMatchException exception = assertThrows(FoodMatchException.class, () -> recipeService.createRecipe(invalidDto, ""));
 
         assertEquals("El título de la receta es obligatorio", exception.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
@@ -91,7 +93,7 @@ class RecipeServiceTest {
         RecipeDetailDto invalidDto = UtilsForTests.recipeDetailDto();
         invalidDto.setPreparationTime(-10);
 
-        FoodMatchException exception = assertThrows(FoodMatchException.class, () -> recipeService.createRecipe(invalidDto));
+        FoodMatchException exception = assertThrows(FoodMatchException.class, () -> recipeService.createRecipe(invalidDto, ""));
 
         assertEquals("El tiempo de preparación no puede ser negativo", exception.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());

@@ -4,9 +4,7 @@ package edu.abga.foodmatch.service;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.Role;
 import edu.abga.foodmatch.model.User;
-import edu.abga.foodmatch.model.dto.UserLoginDto;
-import edu.abga.foodmatch.model.dto.UserRegistrationDto;
-import edu.abga.foodmatch.model.dto.UserResponseDto;
+import edu.abga.foodmatch.model.dto.*;
 import edu.abga.foodmatch.model.mapper.UserMapper;
 import edu.abga.foodmatch.repository.UserRepository;
 import edu.abga.foodmatch.security.JwtUtil;
@@ -76,5 +74,61 @@ public class UserService {
         response.setToken(token);
 
         return response;
+    }
+
+    /**
+     * Updates the profile of an existing user.
+     * @param currentUsername The username of the user to update.
+     * @param updateDto Object with the new profile data.
+     * @return UserResponseDto with the updated user data.
+     * @throws FoodMatchException if the current password is incorrect or if the user does not exist.
+     */
+    public UserResponseDto updateProfile(String currentUsername, UserUpdateDto updateDto) {
+        User user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new FoodMatchException("El usuario no existe", HttpStatus.NOT_FOUND));
+
+        if (!user.getUsername().equals(updateDto.getUsername()) &&
+                userRepository.existsByUsername(updateDto.getUsername())) {
+            throw new FoodMatchException("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);
+        }
+
+        if (!user.getEmail().equals(updateDto.getEmail()) &&
+                userRepository.existsByEmail(updateDto.getEmail())) {
+            throw new FoodMatchException("El email ya está en uso", HttpStatus.CONFLICT);
+        }
+
+        user.setUsername(updateDto.getUsername());
+        user.setEmail(updateDto.getEmail());
+        user.setAvatarUrl(updateDto.getAvatarUrl());
+
+        User savedUser = userRepository.save(user);
+
+        UserResponseDto response = userMapper.toResponseDto(savedUser);
+
+
+        String newToken = jwtUtil.generateToken(savedUser.getUsername());
+        response.setToken(newToken);
+
+        return response;
+    }
+
+
+    /**
+     * Changes the password of an existing user.
+     * @param currentUsername the username of the user to update.
+     * @param dto the DTO with the current and new password.
+     * @throws FoodMatchException if the current password is incorrect or if the user does not exist.
+     */
+    public void changePassword(String currentUsername, PasswordChangeDto dto) {
+        User user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado",HttpStatus.NOT_FOUND));
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new FoodMatchException("La contraseña actual es incorrecta",
+                    HttpStatus.BAD_REQUEST );
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 }

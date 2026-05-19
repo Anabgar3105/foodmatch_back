@@ -58,4 +58,9 @@ public class UserResponseDto {
      * The authentication token
      */
     private String token;
+
+    /**
+     * The avatar URL
+     */
+    private String avatarUrl;
 }

@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Service to manage the logic of uploading images to Cloudinary and retrieving their URLs.
@@ -27,14 +26,20 @@ public class CloudinaryService {
      * @param file Multipart file to be uploaded.
      * @return URL of the uploaded image.
      */
-    public String uploadImage(MultipartFile file) throws IOException {
-        String uniqueFilename = UUID.randomUUID().toString();
+    public String uploadImage(MultipartFile file, String folder, String publicId) throws IOException {
+        Map<String, Object> options = new java.util.HashMap<>();
+        options.put("folder", "foodmatch/" + folder);
 
-        // Guardar en la carpeta foodmatch/recipes
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                "public_id", "foodmatch/recipes/" + uniqueFilename,
-                "folder", "foodmatch_app"
-        ));
+        if (publicId != null) {
+            options.put("public_id", publicId);
+            options.put("overwrite", true);
+            options.put("invalidate", true);
+        }
+
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getBytes(),
+                options
+        );
 
         return uploadResult.get("secure_url").toString();
     }
