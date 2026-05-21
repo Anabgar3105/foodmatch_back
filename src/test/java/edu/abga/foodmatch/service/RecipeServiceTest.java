@@ -9,7 +9,7 @@ import edu.abga.foodmatch.model.dto.RecipeDetailDto;
 import edu.abga.foodmatch.model.mapper.RecipeMapper;
 import edu.abga.foodmatch.repository.RecipeRepository;
 import edu.abga.foodmatch.repository.UserRepository;
-import edu.abga.foodmatch.util.UtilsForTests;
+import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -266,5 +266,177 @@ class RecipeServiceTest {
         assertEquals("No tienes permisos para borrar esta receta", exception.getMessage());
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         verify(recipeRepository, never()).delete(any(Recipe.class));
+    }
+
+    /**
+     * Verifies that the service successfully retrieves all recipes created by a specific user.
+     * Ensures that the repository is called with the correct user ID and the DTOs are correctly mapped.
+     */
+    @Test
+    void getMyRecipesReturnsListOfRecipeCardsForUser() {
+        String username = "d.redondo";
+        User mockUser = UtilsForTests.userEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername(username);
+
+        List<Recipe> mockRecipes = List.of(UtilsForTests.recipeEntity());
+
+        when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.of(mockUser));
+        when(recipeRepository.findByUserId(mockUser.getId())).thenReturn(mockRecipes);
+        when(recipeMapper.toCardDto(any(Recipe.class))).thenReturn(UtilsForTests.recipeCardDto());
+
+        List<RecipeCardDto> results = recipeService.getMyRecipes(username);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals("Tortilla de Patatas", results.get(0).getTitle());
+        verify(userRepository).findByUsername(username);
+        verify(recipeRepository).findByUserId(mockUser.getId());
+    }
+
+    /**
+     * Verifies that the service throws a 404 Not Found exception when trying to retrieve
+     * recipes for a user that does not exist in the system.
+     */
+    @Test
+    void getMyRecipesThrowsExceptionWhenUserNotFound() {
+        String username = "nonexistent.user";
+
+        when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.empty());
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.getMyRecipes(username));
+
+        assertEquals("Usuario no encontrado", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        verify(recipeRepository, never()).findByUserId(any());
+    }
+
+    /**
+     * Verifies that the service returns an empty list when a user has no recipes.
+     */
+    @Test
+    void getMyRecipesReturnsEmptyListWhenUserHasNoRecipes() {
+        String username = "d.redondo";
+        User mockUser = UtilsForTests.userEntity();
+        mockUser.setId(1L);
+        mockUser.setUsername(username);
+
+        when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.of(mockUser));
+        when(recipeRepository.findByUserId(mockUser.getId())).thenReturn(List.of());
+
+        List<RecipeCardDto> results = recipeService.getMyRecipes(username);
+
+        assertNotNull(results);
+        assertTrue(results.isEmpty());
+        verify(userRepository).findByUsername(username);
+        verify(recipeRepository).findByUserId(mockUser.getId());
+    }
+
+    /**
+     * Verifies that a recipe is successfully updated when the requesting user is the owner.
+     */
+    @Test
+    void updateRecipeSuccessWhenUserIsOwner() {
+        Long recipeId = 1L;
+        String username = "d.redondo";
+
+        User mockOwner = UtilsForTests.userEntity();
+        mockOwner.setId(1L);
+        mockOwner.setUsername(username);
+
+        Recipe mockRecipe = UtilsForTests.recipeEntity();
+        mockRecipe.setId(recipeId);
+        mockRecipe.setUser(mockOwner);
+
+        RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+        updateDto.setTitle("Tortilla de Patatas Actualizada");
+        updateDto.setDescription("Una descripción actualizada");
+        updateDto.setPreparationTime(45);
+        updateDto.setCategory("PLATOS_COMPLETOS");
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.of(mockRecipe));
+        when(recipeRepository.save(any(Recipe.class))).thenReturn(mockRecipe);
+        when(recipeMapper.toDetailDto(any(Recipe.class))).thenReturn(updateDto);
+
+        RecipeDetailDto result = recipeService.updateRecipe(recipeId, updateDto, username);
+
+        assertNotNull(result);
+        assertEquals("Tortilla de Patatas Actualizada", result.getTitle());
+        verify(recipeRepository).findById(recipeId);
+        verify(recipeRepository).save(any(Recipe.class));
+    }
+
+    /**
+     * Verifies that a 404 Not Found exception is thrown when trying to update a recipe that does not exist.
+     */
+    @Test
+    void updateRecipeThrowsExceptionWhenRecipeNotFound() {
+        Long recipeId = 999L;
+        String username = "d.redondo";
+        RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+        updateDto.setCategory("PLATOS_COMPLETOS");
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.empty());
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.updateRecipe(recipeId, updateDto, username));
+
+        assertEquals("La receta no existe", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        verify(recipeRepository, never()).save(any(Recipe.class));
+    }
+
+    /**
+     * Verifies that a 403 Forbidden exception is thrown when a user attempts to update a recipe they do not own.
+     */
+    @Test
+    void updateRecipeThrowsExceptionWhenUserIsNotOwner() {
+        Long recipeId = 1L;
+        String username = "other.user";
+
+        User mockOwner = UtilsForTests.userEntity();
+        mockOwner.setId(1L);
+        mockOwner.setUsername("d.redondo");
+
+        Recipe mockRecipe = UtilsForTests.recipeEntity();
+        mockRecipe.setUser(mockOwner);
+
+        RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+        updateDto.setCategory("PLATOS_COMPLETOS");
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.of(mockRecipe));
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.updateRecipe(recipeId, updateDto, username));
+
+        assertEquals("No tienes permisos para editar esta receta", exception.getMessage());
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        verify(recipeRepository, never()).save(any(Recipe.class));
+    }
+
+    /**
+     * Verifies that a 403 Forbidden exception is thrown when a recipe has no owner (is public)
+     * and a user tries to update it.
+     */
+    @Test
+    void updateRecipeThrowsExceptionWhenRecipeHasNoOwner() {
+        Long recipeId = 1L;
+        String username = "d.redondo";
+
+        Recipe mockRecipe = UtilsForTests.recipeEntity();
+        mockRecipe.setUser(null); // Receta pública, sin propietario
+
+        RecipeDetailDto updateDto = UtilsForTests.recipeDetailDto();
+        updateDto.setCategory("PLATOS_COMPLETOS");
+
+        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.of(mockRecipe));
+
+        FoodMatchException exception = assertThrows(FoodMatchException.class,
+                () -> recipeService.updateRecipe(recipeId, updateDto, username));
+
+        assertEquals("No tienes permisos para editar esta receta", exception.getMessage());
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        verify(recipeRepository, never()).save(any(Recipe.class));
     }
 }

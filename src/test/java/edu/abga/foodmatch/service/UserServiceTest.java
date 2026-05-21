@@ -6,7 +6,7 @@ import edu.abga.foodmatch.model.dto.*;
 import edu.abga.foodmatch.model.mapper.UserMapper;
 import edu.abga.foodmatch.repository.UserRepository;
 import edu.abga.foodmatch.security.JwtUtil;
-import edu.abga.foodmatch.util.UtilsForTests;
+import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -135,7 +135,7 @@ class UserServiceTest {
 
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.login(UtilsForTests.loginDto()));
 
-        assertEquals("Credenciales incorrectas", exception.getMessage());
+        assertEquals("El usuario o la contraseña son incorrectos", exception.getMessage());
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 

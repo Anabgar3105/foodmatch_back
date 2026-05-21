@@ -2,7 +2,7 @@ package edu.abga.foodmatch.controller;
 
 import edu.abga.foodmatch.security.WithMockCustomUser;
 import edu.abga.foodmatch.service.FavoriteService;
-import edu.abga.foodmatch.util.UtilsForTests;
+import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;

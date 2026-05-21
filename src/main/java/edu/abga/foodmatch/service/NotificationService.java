@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-@Slf4j // Anotación de Lombok para usar 'log.info()'
+@Slf4j
 public class NotificationService {
 
     private final UserRepository userRepository;

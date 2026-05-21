@@ -29,7 +29,9 @@ public class MediaController {
 
     /**
      * Endpoint to upload and image
+     * @param principal the security principal containing the authenticated user's information
      * @param file the multipart file (image)
+     * @param folder the folder in Cloudinary where the image will be stored (default: "recipes")
      * @return JSON with the URL of the uploaded image in Cloudinary
      */
     @PostMapping("/upload")

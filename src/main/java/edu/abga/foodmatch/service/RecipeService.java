@@ -1,10 +1,7 @@
 package edu.abga.foodmatch.service;
 
 import edu.abga.foodmatch.exception.FoodMatchException;
-import edu.abga.foodmatch.model.Recipe;
-import edu.abga.foodmatch.model.RecipeCategory;
-import edu.abga.foodmatch.model.Role;
-import edu.abga.foodmatch.model.User;
+import edu.abga.foodmatch.model.*;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
 import edu.abga.foodmatch.model.mapper.RecipeMapper;
@@ -160,5 +157,76 @@ public class RecipeService {
         recipe.setImage(imageUrl);
         Recipe savedRecipe = recipeRepository.save(recipe);
         return recipeMapper.toDetailDto(savedRecipe);
+    }
+
+    /**
+     * Gets the recipes created by a specific user
+     * @param username the username of the user whose recipes we want to retrieve
+     * @return a list of RecipeCardDto representing the recipes created by the user.
+     */
+    public List<RecipeCardDto> getMyRecipes(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+
+        List<Recipe> myRecipes = recipeRepository.findByUserId(user.getId());
+
+        return myRecipes.stream()
+                .map(recipeMapper::toCardDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Updates an existing recipe, validating permissions and input data.
+     * @param recipeId the id of the recipe to update
+     * @param recipeDto the new data for the recipe
+     * @param username the username of the authenticated user making the request
+     * @return RecipeDetailDto with the updated recipe information.
+     * @throws FoodMatchException if the recipe is not found, the user is not found
+     */
+    @Transactional
+    public RecipeDetailDto updateRecipe(Long recipeId, RecipeDetailDto recipeDto, String username) {
+
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new FoodMatchException("La receta no existe", HttpStatus.NOT_FOUND));
+
+        if (recipe.getUser() == null || !recipe.getUser().getUsername().equals(username)) {
+            throw new FoodMatchException("No tienes permisos para editar esta receta", HttpStatus.FORBIDDEN);
+        }
+
+        recipe.setTitle(recipeDto.getTitle());
+        recipe.setDescription(recipeDto.getDescription());
+        recipe.setPreparationTime(recipeDto.getPreparationTime());
+        if (recipeDto.getCategory() != null) {
+            recipe.setCategory(edu.abga.foodmatch.model.RecipeCategory.valueOf(recipeDto.getCategory().toUpperCase()));
+        }
+
+        if (recipeDto.getImage() != null && !recipeDto.getImage().isEmpty()) {
+            recipe.setImage(recipeDto.getImage());
+        }
+
+        recipe.getIngredients().clear();
+        if (recipeDto.getIngredients() != null) {
+            recipeDto.getIngredients().forEach(ingDto -> {
+                Ingredient ing = new Ingredient();
+                ing.setName(ingDto.getName());
+                ing.setQuantity(ingDto.getQuantity());
+                ing.setRecipe(recipe);
+                recipe.getIngredients().add(ing);
+            });
+        }
+
+        recipe.getSteps().clear();
+        if (recipeDto.getSteps() != null) {
+            recipeDto.getSteps().forEach(stepDto -> {
+                ElaborationStep step = new ElaborationStep();
+                step.setStepNum(stepDto.getStepNum());
+                step.setInstruction(stepDto.getInstruction());
+                step.setRecipe(recipe);
+                recipe.getSteps().add(step);
+            });
+        }
+
+        Recipe updatedRecipe = recipeRepository.save(recipe);
+        return recipeMapper.toDetailDto(updatedRecipe);
     }
 }
