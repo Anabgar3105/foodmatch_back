@@ -15,7 +15,6 @@ public class SecurityUtils {
 
     /**
      * Retrieves the ID of the currently authenticated user based on the JWT token.
-     *
      * @return The user ID.
      */
     public static Long getCurrentUserId() {

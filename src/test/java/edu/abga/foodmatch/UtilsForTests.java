@@ -1,4 +1,4 @@
-package edu.abga.foodmatch.util;
+package edu.abga.foodmatch;
 
 import edu.abga.foodmatch.model.Recipe;
 import edu.abga.foodmatch.model.RecipeCategory;
@@ -6,14 +6,14 @@ import edu.abga.foodmatch.model.User;
 import edu.abga.foodmatch.model.dto.*;
 
 /**
- * Clase de utilidades para las pruebas unitarias.
- * Centraliza la creación de mocks y DTOs necesarios para los tests.
+ * Utility class for tests, providing methods to create mock objects and DTOs for testing purposes.
+ * <p>This class contains static methods that generate instances of entities and DTOs with predefined data,
+ * simulating real data that would be used in the application. These methods can be used across different test classes to ensure consistency and reduce code duplication when setting up test scenarios.</p>
  */
 public class UtilsForTests {
 
     /**
-     * Genera un DTO de registro simulando los datos de entrada de un nuevo usuario.
-     *
+     * Geenera un UserRegistrationDto simulating the data that a new user would provide when registering in the system.
      * @return UserRegistrationDto.
      */
     public static UserRegistrationDto registrationDto() {
@@ -27,8 +27,7 @@ public class UtilsForTests {
     }
 
     /**
-     * Genera una entidad User simulando un registro ya persistido en la base de datos.
-     *
+     * Generates a User entity simulating a user already persisted in the database, with hashed password.
      * @return User
      */
     public static User userEntity() {
@@ -42,8 +41,7 @@ public class UtilsForTests {
     }
 
     /**
-     * Genera un DTO de respuesta simulando la salida del sistema hacia el cliente.
-     *
+     * Generates a UserResponseDto simulating the data that would be returned to the client after a successful registration or login.
      * @return UserResponseDto
      */
     public static UserResponseDto userResponseDto() {
@@ -56,8 +54,7 @@ public class UtilsForTests {
     }
 
     /**
-     * Genera un DTO de login simulando un intento de autenticación del usuario.
-     *
+     * Generates a UserLoginDto simulating the login data that a user would send to the system when trying to log in.
      * @return UserLoginDto
      */
     public static UserLoginDto loginDto() {
@@ -68,7 +65,7 @@ public class UtilsForTests {
     }
 
      /**
-      * Genera un DTO de detalle de receta para pruebas de creación.
+      * Generates a RecipeDetailDto simulating the data of a recipe that would be sent to the client when requesting the details of a recipe.
       * @return RecipeDetailDto
       */
      public static RecipeDetailDto recipeDetailDto() {
@@ -81,7 +78,7 @@ public class UtilsForTests {
      }
 
     /**
-     * Genera una entidad Recipe simulando que viene de la base de datos.
+     * Generates a Recipe entity simulating a recipe already persisted in the database.
      * @return Recipe
      */
     public static Recipe recipeEntity() {
@@ -91,13 +88,13 @@ public class UtilsForTests {
                 .description("Receta clásica")
                 .preparationTime(30)
                 .category(RecipeCategory.PLATOS_COMPLETOS)
-                .ingredients(new java.util.ArrayList<>()) // Lista inicializada
-                .steps(new java.util.ArrayList<>())       // Lista inicializada
+                .ingredients(new java.util.ArrayList<>())
+                .steps(new java.util.ArrayList<>())
                 .build();
     }
 
     /**
-     * Genera un DTO de tarjeta para las pruebas de búsqueda y listado.
+     * Generates a RecipeCardDto simulating the data that would be sent to the client when requesting a list of recipes or a recipe card.
      * @return RecipeCardDto
      */
     public static RecipeCardDto recipeCardDto() {

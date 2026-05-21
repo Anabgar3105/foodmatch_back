@@ -5,7 +5,7 @@ import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
 import edu.abga.foodmatch.service.RecipeService;
-import edu.abga.foodmatch.util.UtilsForTests;
+import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;

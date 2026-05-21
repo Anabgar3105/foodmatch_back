@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.dto.*;
 import edu.abga.foodmatch.service.UserService;
-import edu.abga.foodmatch.util.UtilsForTests;
+import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;

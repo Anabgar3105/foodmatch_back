@@ -181,7 +181,7 @@ public class RecipeService {
      * @param recipeDto the new data for the recipe
      * @param username the username of the authenticated user making the request
      * @return RecipeDetailDto with the updated recipe information.
-      * @throws FoodMatchException if the recipe is not found, the user is not found
+     * @throws FoodMatchException if the recipe is not found, the user is not found
      */
     @Transactional
     public RecipeDetailDto updateRecipe(Long recipeId, RecipeDetailDto recipeDto, String username) {

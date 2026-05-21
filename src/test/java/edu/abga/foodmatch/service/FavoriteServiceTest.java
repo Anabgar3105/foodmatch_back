@@ -7,7 +7,7 @@ import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.mapper.RecipeMapper;
 import edu.abga.foodmatch.repository.RecipeRepository;
 import edu.abga.foodmatch.repository.UserRepository;
-import edu.abga.foodmatch.util.UtilsForTests;
+import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -62,10 +62,10 @@ public class UserService {
      */
     public UserResponseDto login(UserLoginDto loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsername())
-                .orElseThrow(() -> new FoodMatchException("El usuario no existe", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException("El usuario o la contraseña son incorrectos", HttpStatus.NOT_FOUND));
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new FoodMatchException("Credenciales incorrectas", HttpStatus.UNAUTHORIZED);
+            throw new FoodMatchException("El usuario o la contraseña son incorrectos", HttpStatus.UNAUTHORIZED);
         }
 
         UserResponseDto response = userMapper.toResponseDto(user);

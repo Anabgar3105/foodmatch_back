@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entity that represents a numbered step in a recipe preparation.
@@ -36,10 +38,12 @@ public class ElaborationStep {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String instruction;
 
-    /**
+     /**
      * Recipe
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Recipe recipe;
 }
