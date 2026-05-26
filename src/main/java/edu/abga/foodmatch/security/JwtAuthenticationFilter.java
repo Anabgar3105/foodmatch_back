@@ -1,10 +1,14 @@
 package edu.abga.foodmatch.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.abga.foodmatch.exception.ErrorResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,19 +40,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        username = jwtUtil.extractUsername(jwt);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+        try {
+            username = jwtUtil.extractUsername(jwt);
 
-            if (jwtUtil.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+                if (jwtUtil.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (ExpiredJwtException ex) {
+            // Manejar la excepción de token expirado y enviar respuesta JSON
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .status(HttpServletResponse.SC_UNAUTHORIZED)
+                    .error("Unauthorized")
+                    .message("La sesión ha caducado. Por favor, inicia sesión de nuevo.")
+                    .path(request.getRequestURI())
+                    .build();
+
+            response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
+            return;
         }
+
         filterChain.doFilter(request, response);
     }
 }
+
+

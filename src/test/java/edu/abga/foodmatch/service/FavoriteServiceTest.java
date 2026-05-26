@@ -78,7 +78,7 @@ class FavoriteServiceTest {
         FoodMatchException exception = assertThrows(FoodMatchException.class,
                 () -> favoriteService.addFavorite(userId, recipeId));
 
-        assertEquals("Receta no encontrada", exception.getMessage());
+        assertEquals("La receta no existe", exception.getMessage());
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
         verify(userRepository, never()).save(any(User.class));
     }

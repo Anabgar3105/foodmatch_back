@@ -1,10 +1,11 @@
 package edu.abga.foodmatch.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.abga.foodmatch.UtilsForTests;
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.dto.*;
 import edu.abga.foodmatch.service.UserService;
-import edu.abga.foodmatch.UtilsForTests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -67,13 +68,13 @@ class UserControllerTest {
                 .build();
 
         when(userService.registerUser(any(UserRegistrationDto.class)))
-                .thenThrow(new FoodMatchException("Faltan datos obligatorios", HttpStatus.BAD_REQUEST));
+                .thenThrow(new FoodMatchException(ErrorCode.INVALID_INPUT, HttpStatus.BAD_REQUEST));
 
         mockMvc.perform(post("/api/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Faltan datos obligatorios"))
+                .andExpect(jsonPath("$.message").value("Los datos proporcionados no son válidos"))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -105,13 +106,13 @@ class UserControllerTest {
                 .build();
 
         when(userService.login(any(UserLoginDto.class)))
-                .thenThrow(new FoodMatchException("Credenciales incorrectas", HttpStatus.UNAUTHORIZED));
+                .thenThrow(new FoodMatchException(ErrorCode.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED));
 
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("Credenciales incorrectas"));
+                .andExpect(jsonPath("$.message").value("Usuario o contraseña incorrectos"));
     }
 
     /**
@@ -126,7 +127,7 @@ class UserControllerTest {
                 .build();
 
         when(userService.login(any(UserLoginDto.class)))
-                .thenThrow(new FoodMatchException("El usuario no existe", HttpStatus.NOT_FOUND));
+                .thenThrow(new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -163,7 +164,7 @@ class UserControllerTest {
         UserUpdateDto updateDto = UtilsForTests.userUpdateDto("nonexistent", "nonexistent@email.com", "https://avatar.url");
 
         when(userService.updateProfile(anyString(), any(UserUpdateDto.class)))
-                .thenThrow(new FoodMatchException("El usuario no existe", HttpStatus.NOT_FOUND));
+                .thenThrow(new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         mockMvc.perform(put("/api/users/profile")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -182,14 +183,14 @@ class UserControllerTest {
         UserUpdateDto updateDto = UtilsForTests.userUpdateDto("existing.user", "updated@email.com", "https://avatar.url");
 
         when(userService.updateProfile(anyString(), any(UserUpdateDto.class)))
-                .thenThrow(new FoodMatchException("El nombre de usuario ya está en uso", HttpStatus.CONFLICT));
+                .thenThrow(new FoodMatchException(ErrorCode.DUPLICATE_USERNAME, HttpStatus.CONFLICT));
 
         mockMvc.perform(put("/api/users/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto))
                         .principal(() -> "d.redondo"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("El nombre de usuario ya está en uso"))
+                .andExpect(jsonPath("$.message").value("Este nombre de usuario ya existe"))
                 .andExpect(jsonPath("$.status").value(409));
     }
 
@@ -202,14 +203,14 @@ class UserControllerTest {
         UserUpdateDto updateDto = UtilsForTests.userUpdateDto("d.redondo.updated", "existing@email.com", "https://avatar.url");
 
         when(userService.updateProfile(anyString(), any(UserUpdateDto.class)))
-                .thenThrow(new FoodMatchException("El email ya está en uso", HttpStatus.CONFLICT));
+                .thenThrow(new FoodMatchException(ErrorCode.DUPLICATE_EMAIL, HttpStatus.CONFLICT));
 
         mockMvc.perform(put("/api/users/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto))
                         .principal(() -> "d.redondo"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("El email ya está en uso"));
+                .andExpect(jsonPath("$.message").value("Este email ya está registrado"));
     }
 
     /**
@@ -238,7 +239,7 @@ class UserControllerTest {
     void changePassword_ReturnsBadRequestWhenCurrentPasswordIsIncorrect() throws Exception {
         PasswordChangeDto passwordDto = UtilsForTests.passwordChangeDto("WrongPassword", "NewPassword456");
 
-        doThrow(new FoodMatchException("La contraseña actual es incorrecta", HttpStatus.BAD_REQUEST))
+        doThrow(new FoodMatchException(ErrorCode.INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST))
                 .when(userService).changePassword(anyString(), any(PasswordChangeDto.class));
 
         mockMvc.perform(put("/api/users/password")
@@ -246,7 +247,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(passwordDto))
                         .principal(() -> "d.redondo"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("La contraseña actual es incorrecta"))
+                .andExpect(jsonPath("$.message").value("Usuario o contraseña incorrectos"))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -258,7 +259,7 @@ class UserControllerTest {
     void changePassword_ReturnsNotFoundWhenUserDoesNotExist() throws Exception {
         PasswordChangeDto passwordDto = UtilsForTests.passwordChangeDto("Secreta123", "NewPassword456");
 
-        doThrow(new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND))
+        doThrow(new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND))
                 .when(userService).changePassword(anyString(), any(PasswordChangeDto.class));
 
         mockMvc.perform(put("/api/users/password")
@@ -266,6 +267,6 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(passwordDto))
                         .principal(() -> "nonexistent"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Usuario no encontrado"));
+                .andExpect(jsonPath("$.message").value("El usuario no existe"));
     }
 }

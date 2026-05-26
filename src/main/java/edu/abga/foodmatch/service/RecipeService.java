@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.service;
 
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.*;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
@@ -33,15 +34,15 @@ public class RecipeService {
     @Transactional
     public RecipeDetailDto createRecipe(RecipeDetailDto dto, String username) {
         if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
-            throw new FoodMatchException("El título de la receta es obligatorio", HttpStatus.BAD_REQUEST);
+            throw new FoodMatchException(ErrorCode.INVALID_INPUT, "El título de la receta es obligatorio", HttpStatus.BAD_REQUEST);
         }
 
         if (dto.getPreparationTime() != null && dto.getPreparationTime() < 0) {
-            throw new FoodMatchException("El tiempo de preparación no puede ser negativo", HttpStatus.BAD_REQUEST);
+            throw new FoodMatchException(ErrorCode.INVALID_INPUT, "El tiempo de preparación no puede ser negativo", HttpStatus.BAD_REQUEST);
         }
 
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new FoodMatchException("Usuario creador no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         Recipe recipe = recipeMapper.toEntity(dto);
         recipe.setUser(creator);
@@ -105,7 +106,7 @@ public class RecipeService {
     @Transactional(readOnly = true)
     public RecipeDetailDto getRecipeById(Long id, Long currentUserId) {
         Recipe recipe = recipeRepository.findRecipeById(id, currentUserId)
-                .orElseThrow(() -> new FoodMatchException("Receta no encontrada", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         return recipeMapper.toDetailDto(recipe);
     }
@@ -119,16 +120,16 @@ public class RecipeService {
     @Transactional
     public void deleteRecipe(Long recipeId, Long currentUserId) {
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new FoodMatchException("Receta no encontrada", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         boolean isOwner = recipe.getUser() != null && recipe.getUser().getId().equals(currentUserId);
         boolean isAdmin = currentUser.getRole() == Role.ADMIN;
 
         if (!isOwner && !isAdmin) {
-            throw new FoodMatchException("No tienes permisos para borrar esta receta", HttpStatus.FORBIDDEN);
+            throw new FoodMatchException(ErrorCode.INSUFFICIENT_PERMISSIONS, "No tienes permisos para borrar esta receta", HttpStatus.FORBIDDEN);
         }
 
         recipeRepository.delete(recipe);
@@ -145,13 +146,13 @@ public class RecipeService {
     @Transactional
     public RecipeDetailDto updateRecipeImage(Long recipeId, String imageUrl, Long currentUserId) {
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new FoodMatchException("Receta no encontrada", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (!recipe.getUser().getId().equals(currentUserId) && currentUser.getRole() != Role.ADMIN) {
-            throw new FoodMatchException("No tienes permiso para editar esta receta", HttpStatus.FORBIDDEN);
+            throw new FoodMatchException(ErrorCode.INSUFFICIENT_PERMISSIONS, "No tienes permiso para editar esta receta", HttpStatus.FORBIDDEN);
         }
 
         recipe.setImage(imageUrl);
@@ -166,7 +167,7 @@ public class RecipeService {
      */
     public List<RecipeCardDto> getMyRecipes(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         List<Recipe> myRecipes = recipeRepository.findByUserId(user.getId());
 
@@ -187,10 +188,10 @@ public class RecipeService {
     public RecipeDetailDto updateRecipe(Long recipeId, RecipeDetailDto recipeDto, String username) {
 
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new FoodMatchException("La receta no existe", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (recipe.getUser() == null || !recipe.getUser().getUsername().equals(username)) {
-            throw new FoodMatchException("No tienes permisos para editar esta receta", HttpStatus.FORBIDDEN);
+            throw new FoodMatchException(ErrorCode.INSUFFICIENT_PERMISSIONS, "No tienes permisos para editar esta receta", HttpStatus.FORBIDDEN);
         }
 
         recipe.setTitle(recipeDto.getTitle());

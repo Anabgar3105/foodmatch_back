@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.controller;
 
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +56,7 @@ public class MediaController {
             return ResponseEntity.ok(response);
 
         } catch (IOException e) {
-            throw new FoodMatchException("Error al procesar y subir la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new FoodMatchException(ErrorCode.IMAGE_UPLOAD_FAILED, "Error al procesar y subir la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

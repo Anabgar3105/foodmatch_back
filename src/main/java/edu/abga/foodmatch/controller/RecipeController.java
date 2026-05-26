@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.controller;
 
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
@@ -156,7 +157,7 @@ public class RecipeController {
 
         String imageUrl = body.get("url");
         if (imageUrl == null || imageUrl.isEmpty()) {
-            throw new FoodMatchException("La URL de la imagen es obligatoria", HttpStatus.BAD_REQUEST);
+            throw new FoodMatchException(ErrorCode.INVALID_INPUT, "La URL de la imagen es obligatoria", HttpStatus.BAD_REQUEST);
         }
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
