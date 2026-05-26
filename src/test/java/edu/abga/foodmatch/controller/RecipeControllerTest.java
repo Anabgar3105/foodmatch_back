@@ -1,6 +1,7 @@
 package edu.abga.foodmatch.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
@@ -78,14 +79,14 @@ class RecipeControllerTest {
         RecipeDetailDto inputDto = RecipeDetailDto.builder().build();
 
         when(recipeService.createRecipe(any(RecipeDetailDto.class), anyString()))
-                .thenThrow(new FoodMatchException("El título de la receta es obligatorio", HttpStatus.BAD_REQUEST));
+                .thenThrow(new FoodMatchException(ErrorCode.MISSING_FIELD, HttpStatus.BAD_REQUEST));
 
         mockMvc.perform(post("/api/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(inputDto))
                         .principal(() -> "d.redondo"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("El título de la receta es obligatorio"))
+                .andExpect(jsonPath("$.message").value("Falta un campo requerido"))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -160,13 +161,13 @@ class RecipeControllerTest {
     @Test
     @WithMockCustomUser
     void deleteRecipeReturnsForbiddenWhenNoPermissions() throws Exception {
-        doThrow(new FoodMatchException("No tienes permisos para borrar esta receta", HttpStatus.FORBIDDEN))
+        doThrow(new FoodMatchException(ErrorCode.INSUFFICIENT_PERMISSIONS, HttpStatus.FORBIDDEN))
                 .when(recipeService).deleteRecipe(anyLong(), anyLong());
 
         mockMvc.perform(delete("/api/recipes/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("No tienes permisos para borrar esta receta"))
+                .andExpect(jsonPath("$.message").value("No tienes permisos para realizar esta acción"))
                 .andExpect(jsonPath("$.status").value(403));
     }
 
@@ -249,13 +250,13 @@ class RecipeControllerTest {
      @WithMockCustomUser
      void getMyRecipesReturnsNotFoundWhenUserDoesNotExist() throws Exception {
          when(recipeService.getMyRecipes("d.redondo"))
-                 .thenThrow(new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                 .thenThrow(new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
          mockMvc.perform(get("/api/recipes/my-recipes")
                          .contentType(MediaType.APPLICATION_JSON)
                          .principal(() -> "d.redondo"))
                  .andExpect(status().isNotFound())
-                 .andExpect(jsonPath("$.message").value("Usuario no encontrado"))
+                 .andExpect(jsonPath("$.message").value("El usuario no existe"))
                  .andExpect(jsonPath("$.status").value(404));
      }
 
@@ -296,7 +297,7 @@ class RecipeControllerTest {
          updateDto.setCategory("PLATOS_COMPLETOS");
 
          when(recipeService.updateRecipe(eq(recipeId), any(RecipeDetailDto.class), anyString()))
-                 .thenThrow(new FoodMatchException("La receta no existe", HttpStatus.NOT_FOUND));
+                 .thenThrow(new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
          mockMvc.perform(put("/api/recipes/{id}", recipeId)
                          .contentType(MediaType.APPLICATION_JSON)
@@ -319,14 +320,14 @@ class RecipeControllerTest {
          updateDto.setCategory("PLATOS_COMPLETOS");
 
          when(recipeService.updateRecipe(eq(recipeId), any(RecipeDetailDto.class), eq("d.redondo")))
-                 .thenThrow(new FoodMatchException("No tienes permisos para editar esta receta", HttpStatus.FORBIDDEN));
+                 .thenThrow(new FoodMatchException(ErrorCode.INSUFFICIENT_PERMISSIONS, HttpStatus.FORBIDDEN));
 
          mockMvc.perform(put("/api/recipes/{id}", recipeId)
                          .contentType(MediaType.APPLICATION_JSON)
                          .content(objectMapper.writeValueAsString(updateDto))
                          .principal(() -> "d.redondo"))
                  .andExpect(status().isForbidden())
-                 .andExpect(jsonPath("$.message").value("No tienes permisos para editar esta receta"))
+                 .andExpect(jsonPath("$.message").value("No tienes permisos para realizar esta acción"))
                  .andExpect(jsonPath("$.status").value(403));
      }
 

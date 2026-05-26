@@ -1,6 +1,7 @@
 package edu.abga.foodmatch.service;
 
 
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.Role;
 import edu.abga.foodmatch.model.User;
@@ -39,10 +40,10 @@ public class UserService {
         ValidationUtils.validateRegistrationData(registrationDto);
 
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
-            throw new FoodMatchException("El email ya está en uso", HttpStatus.CONFLICT);
+            throw new FoodMatchException(ErrorCode.DUPLICATE_EMAIL, "Este email ya está registrado", HttpStatus.CONFLICT);
         }
         if (userRepository.existsByUsername(registrationDto.getUsername())) {
-            throw new FoodMatchException("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);
+            throw new FoodMatchException(ErrorCode.DUPLICATE_USERNAME, "Este nombre de usuario ya existe", HttpStatus.CONFLICT);
         }
 
         User userToSave = userMapper.toEntity(registrationDto);
@@ -62,10 +63,10 @@ public class UserService {
      */
     public UserResponseDto login(UserLoginDto loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsername())
-                .orElseThrow(() -> new FoodMatchException("El usuario o la contraseña son incorrectos", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.INVALID_CREDENTIALS, "Usuario o contraseña incorrectos", HttpStatus.UNAUTHORIZED));
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
-            throw new FoodMatchException("El usuario o la contraseña son incorrectos", HttpStatus.UNAUTHORIZED);
+            throw new FoodMatchException(ErrorCode.INVALID_CREDENTIALS, "Usuario o contraseña incorrectos", HttpStatus.UNAUTHORIZED);
         }
 
         UserResponseDto response = userMapper.toResponseDto(user);
@@ -85,16 +86,16 @@ public class UserService {
      */
     public UserResponseDto updateProfile(String currentUsername, UserUpdateDto updateDto) {
         User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new FoodMatchException("El usuario no existe", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, "El usuario no existe", HttpStatus.NOT_FOUND));
 
         if (!user.getUsername().equals(updateDto.getUsername()) &&
                 userRepository.existsByUsername(updateDto.getUsername())) {
-            throw new FoodMatchException("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);
+            throw new FoodMatchException(ErrorCode.DUPLICATE_USERNAME, "Este nombre de usuario ya existe", HttpStatus.CONFLICT);
         }
 
         if (!user.getEmail().equals(updateDto.getEmail()) &&
                 userRepository.existsByEmail(updateDto.getEmail())) {
-            throw new FoodMatchException("El email ya está en uso", HttpStatus.CONFLICT);
+            throw new FoodMatchException(ErrorCode.DUPLICATE_EMAIL, "Este email ya está registrado", HttpStatus.CONFLICT);
         }
 
         user.setUsername(updateDto.getUsername());
@@ -121,11 +122,10 @@ public class UserService {
      */
     public void changePassword(String currentUsername, PasswordChangeDto dto) {
         User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado",HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, "Usuario no encontrado", HttpStatus.NOT_FOUND));
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-            throw new FoodMatchException("La contraseña actual es incorrecta",
-                    HttpStatus.BAD_REQUEST );
+            throw new FoodMatchException(ErrorCode.INVALID_CREDENTIALS, "La contraseña actual es incorrecta", HttpStatus.UNAUTHORIZED);
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));

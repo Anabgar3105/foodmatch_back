@@ -192,7 +192,7 @@ class RecipeServiceTest {
         FoodMatchException exception = assertThrows(FoodMatchException.class,
                 () -> recipeService.getRecipeById(recipeId, userId));
 
-        assertEquals("Receta no encontrada", exception.getMessage());
+        assertEquals("La receta no existe", exception.getMessage());
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
 
@@ -307,7 +307,7 @@ class RecipeServiceTest {
         FoodMatchException exception = assertThrows(FoodMatchException.class,
                 () -> recipeService.getMyRecipes(username));
 
-        assertEquals("Usuario no encontrado", exception.getMessage());
+        assertEquals("El usuario no existe", exception.getMessage());
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
         verify(recipeRepository, never()).findByUserId(any());
     }

@@ -83,7 +83,7 @@ class UserServiceTest {
 
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.registerUser(UtilsForTests.registrationDto()));
 
-        assertEquals("El email ya está en uso", exception.getMessage());
+        assertEquals("Este email ya está registrado", exception.getMessage());
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -99,7 +99,7 @@ class UserServiceTest {
 
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.registerUser(UtilsForTests.registrationDto()));
 
-        assertEquals("El nombre de usuario ya está en uso", exception.getMessage());
+        assertEquals("Este nombre de usuario ya existe", exception.getMessage());
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -135,7 +135,7 @@ class UserServiceTest {
 
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.login(UtilsForTests.loginDto()));
 
-        assertEquals("El usuario o la contraseña son incorrectos", exception.getMessage());
+        assertEquals("Usuario o contraseña incorrectos", exception.getMessage());
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
@@ -198,7 +198,7 @@ class UserServiceTest {
 
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.updateProfile("d.redondo", updateDto));
 
-        assertEquals("El nombre de usuario ya está en uso", exception.getMessage());
+        assertEquals("Este nombre de usuario ya existe", exception.getMessage());
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -218,7 +218,7 @@ class UserServiceTest {
 
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.updateProfile("d.redondo", updateDto));
 
-        assertEquals("El email ya está en uso", exception.getMessage());
+        assertEquals("Este email ya está registrado", exception.getMessage());
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -301,7 +301,7 @@ class UserServiceTest {
         FoodMatchException exception = assertThrows(FoodMatchException.class, () -> userService.changePassword("d.redondo", passwordChangeDto));
 
         assertEquals("La contraseña actual es incorrecta", exception.getMessage());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
         verify(userRepository, never()).save(any(User.class));
     }
 }

@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.util;
 
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.security.CustomUserDetails;
 import org.springframework.http.HttpStatus;
@@ -21,13 +22,13 @@ public class SecurityUtils {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || Objects.requireNonNull(authentication.getPrincipal()).equals("anonymousUser")) {
-            throw new FoodMatchException("No hay un usuario autenticado en la sesión", HttpStatus.UNAUTHORIZED);
+            throw new FoodMatchException(ErrorCode.TOKEN_INVALID, "No hay un usuario autenticado en la sesión", HttpStatus.UNAUTHORIZED);
         }
 
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             return ((CustomUserDetails) authentication.getPrincipal()).getId();
         }
 
-        throw new FoodMatchException("Error al extraer la información del usuario de seguridad", HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new FoodMatchException(ErrorCode.INTERNAL_SERVER_ERROR, "Error al extraer la información del usuario de seguridad", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
