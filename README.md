@@ -1,3 +1,5 @@
+<div align="center">
+  
 # FoodMatch Backend 🍽️
 
 ![Java](https://img.shields.io/badge/Java-17-blue)
@@ -6,6 +8,7 @@
 ![JWT](https://img.shields.io/badge/Security-JWT-orange)
 ![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
 ![REST API](https://img.shields.io/badge/API-REST-blueviolet)
+</div>
 
 > **API REST potente y segura** que alimenta la experiencia culinaria de FoodMatch. MVP completamente funcional con autenticación JWT, gestión de recetas y sistema de favoritos.
 
