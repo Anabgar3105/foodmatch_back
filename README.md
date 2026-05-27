@@ -1,93 +1,304 @@
-# FoodMatch 🍽️
+<div align="center">
+  
+# FoodMatch Backend 🍽️
 
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.4-brightgreen)
 ![Maven](https://img.shields.io/badge/Maven-4.0.0-red)
+![JWT](https://img.shields.io/badge/Security-JWT-orange)
+![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
+![REST API](https://img.shields.io/badge/API-REST-blueviolet)
+</div>
 
-**⚠️ Proyecto en Construcción ⚠️**
+> **API REST potente y segura** que alimenta la experiencia culinaria de FoodMatch. MVP completamente funcional con autenticación JWT, gestión de recetas y sistema de favoritos.
 
-> Este proyecto es la parte del **backend** de FoodMatch y se encuentra en desarrollo activo. Futuras actualizaciones incluirán más endpoints, implementación de seguridad con JWT y funcionalidades adicionales para dar soporte a la aplicación móvil.
+**📱 Frontend:** ¿Buscas la app móvil? Consulta el [README del Frontend](https://github.com/Anabgar3105/foodmatch_app)
 
-## 📜 Sobre el Proyecto
+**⚠️ Estado:** Actualmente solo funciona **en local**. Consulta la sección de [Instalación](#-instalación-y-ejecución) para configurarlo.
 
-FoodMatch es un sistema integral de software diseñado para los amantes de la cocina, que combina una API REST potente con una aplicación móvil intuitiva.
+## 🎯 Descripción General
 
-El objetivo es transformar el descubrimiento de recetas en una experiencia ágil e interactiva, basada en un sistema de tarjetas visuales (swipe cards):
+La vida moderna y las limitaciones presupuestarias son barreras significativas para mantener comidas diarias variadas y económicas, generando dependencia de comida rápida o servicios de entrega costosos.
 
-*   **Mecánica Swipe:** Los usuarios pueden deslizar para indicar si les gusta o no una receta, creando una lista de favoritos personalizada.
-*   **Descubrimiento y Cocina:** Explora recetas guardadas con información detallada y un modo de cocinado "paso a paso".
-*   **Comunidad:** Los usuarios registrados pueden subir sus propias recetas y gestionar su perfil.
+**FoodMatch** aborda este problema desarrollando una aplicación móvil multiplataforma que **conecta a usuarios con poco tiempo o presupuesto ajustado con recetas fáciles, rápidas y económicas**. El objetivo es proporcionar una interfaz intuitiva basada en gestos (swipe cards) que agilice el descubrimiento de recetas, integrado con herramientas de gestión personal.
 
-## 🏛️ Arquitectura
+El backend implementa una **arquitectura Cliente-Servidor robusta**:
+- 🔐 Autenticación segura con JWT (tokens stateless)
+- 🍳 Catálogo completo de recetas con ingredientes y pasos
+- ❤️ Sistema de favoritos para personalizació de experiencia
+- 📸 Almacenamiento de imágenes en Cloudinary CDN
+- 🔍 Búsqueda y filtrado por categoría y tiempo de preparación
+- ⚙️ Endpoints REST para CRUD completo de recetas
 
-El sistema se compone de dos partes principales:
+## ⭐ Características Implementadas
 
-1.  **Backend (Este Repositorio):** Una API REST desarrollada con **Spring Boot** que se encarga de toda la lógica de negocio, la gestión de datos y la seguridad.
-2.  **Frontend (App Móvil):** Una aplicación desarrollada en **Flutter** que consume esta API para ofrecer una experiencia de usuario fluida e interactiva.
+### 🔐 Autenticación & Usuarios
+- ✅ Registro de usuarios con validación de email y username únicos
+- ✅ Login con generación de tokens JWT (60 días de validez)
+- ✅ Actualización de perfil (nombre, email, avatar)
+- ✅ Cambio de contraseña (con verificación de contraseña anterior)
+- ✅ Hashing seguro con BCrypt
+- ✅ Roles de usuario: USER y ADMIN
 
-## ✨ Características Actuales del Backend
+### 🍳 Gestión de Recetas
+- ✅ Crear recetas con ingredientes y pasos de elaboración
+- ✅ Listar todas las recetas disponibles (públicas + propias)
+- ✅ Obtener detalles completos de una receta
+- ✅ Buscar y filtrar por:
+  - 🏷️ Categoría (ENTRANTES, SNACKS, PLATOS_COMPLETOS, POSTRES)
+  - ⏱️ Tiempo de preparación máximo
+- ✅ Ver solo mis recetas (usuario autenticado)
+- ✅ Editar recetas (solo creador)
+- ✅ Eliminar recetas (creador o ADMIN)
+- ✅ Actualizar imagen de receta
 
-*   **Gestión de usuarios:** Endpoints para registro e inicio de sesión.
-*   **Catálogo de recetas:** Operaciones CRUD para recetas, incluyendo ingredientes y pasos de elaboración.
-*   **Búsqueda y filtrado:** Búsqueda de recetas por categoría y tiempo de preparación.
+### ❤️ Sistema de Favoritos
+- ✅ Guardar recetas como favoritas ("Match")
+- ✅ Eliminar de favoritos
+- ✅ Listar favoritos con formato de tarjetas para UI
+- ✅ Relación many-to-many Usuario-Receta
 
-## 🔮 Próximas Características
+### 📸 Manejo de Medios
+- ✅ Subida de imágenes a Cloudinary
+- ✅ Soporte para carpetas: recetas y avatares
+- ✅ Validación de tamaño (máx 10MB)
+- ✅ Nombrado automático de avatares
 
-*   **Seguridad con JWT:** Implementación de JSON Web Tokens para proteger los endpoints.
-*   **Gestión de Favoritos:** Endpoints para que los usuarios guarden y gestionen sus recetas favoritas.
-*   **Subida de Recetas:** Funcionalidad para que los usuarios aporten sus propias recetas.
-*   **Paginación y Búsquedas Avanzadas:** Mejoras en la consulta de datos para un rendimiento óptimo.
+## 🏗️ Arquitectura Técnica
 
-## 🛠️ Construido Con
+### Estructura de Base de Datos
 
-*   **Spring Boot:** Framework principal de la aplicación.
-*   **Spring Data JPA:** Para la persistencia de datos.
-*   **Spring Security:** Para la futura implementación de seguridad.
-*   **H2 Database:** Base de datos en memoria para desarrollo y pruebas.
-*   **Maven:** Gestor de dependencias y construcción.
-*   **Lombok:** Para reducir el código repetitivo (getters, setters, constructores, etc.).
+```
+users (Usuarios del sistema)
+├── id, name, surname1, surname2
+├── email (único), username (único)
+├── password (BCrypt), role
+├── register_date, avatar_url
+└── relación 1:N con recipes y M:M con favorites
 
-## 🚀 Cómo Empezar
+recipes (Catálogo de recetas)
+├── id, title, description
+├── preparation_time, category
+├── image, user_id (FK)
+├── relación 1:N con ingredients
+├── relación 1:N con elaboration_steps
+└── relación M:M con users (favorites)
 
-Para obtener una copia local del backend y ponerla en funcionamiento:
+ingredients (Ingredientes de receta)
+├── id, name, quantity
+└── recipe_id (FK)
 
-### ✅ Prerrequisitos
+elaboration_steps (Pasos de elaboración)
+├── id, step_number, instruction
+└── recipe_id (FK)
 
-*   JDK 17 o superior.
-*   Maven 3.6 o superior.
+favourites (Relación many-to-many)
+├── user_id (FK)
+└── recipe_id (FK)
+```
 
-### ⚙️ Instalación
+### Stack Tecnológico
 
-1.  Clona el repositorio:
-    ```sh
-    git clone https://github.com/tu_usuario/FoodMatch.git
-    ```
-2.  Navega al directorio del proyecto:
-    ```sh
-    cd FoodMatch
-    ```
-3.  Instala las dependencias:
-    ```sh
-    mvn install
-    ```
-4.  Ejecuta la aplicación:
-    ```sh
-    mvn spring-boot:run
-    ```
+| Componente | Tecnología | Propósito |
+|---|---|---|
+| **Framework** | Spring Boot 3.2.4 | Desarrollo REST API |
+| **ORM** | Spring Data JPA | Persistencia de datos |
+| **Seguridad** | Spring Security + JWT | Autenticación stateless |
+| **Base de Datos** | MySQL 8+ | Almacenamiento persistente |
+| **Storage** | Cloudinary CDN | Hosting de imágenes |
+| **Build** | Maven 4.0.0 | Gestión de dependencias |
+| **Utilidades** | Lombok | Reducción de boilerplate |
 
-La API estará disponible en `http://localhost:8080`.
+## 📡 Endpoints de la API
 
-## 📡 Endpoints de la API (Actuales)
+### 🔓 Públicos (sin autenticación)
 
-### Usuarios
+```
+POST   /api/users/signup          → Registrar nuevo usuario
+POST   /api/users/login           → Iniciar sesión (retorna JWT)
+```
 
-*   `POST /api/users/signup`: Registrar un nuevo usuario.
-*   `POST /api/users/login`: Iniciar sesión.
+### 🔒 Protegidos (requieren JWT válido)
 
-### Recetas
+#### Usuarios
+```
+PUT    /api/users/profile         → Actualizar perfil
+PUT    /api/users/password        → Cambiar contraseña
+```
 
-*   `POST /api/recipes`: Crear una nueva receta.
-*   `GET /api/recipes`: Obtener todas las recetas.
-*   `GET /api/recipes/search`: Buscar recetas por filtros.
+#### Recetas
+```
+GET    /api/recipes               → Listar todas las recetas
+GET    /api/recipes/{id}          → Obtener detalles de receta
+GET    /api/recipes/my-recipes    → Listar mis recetas
+GET    /api/recipes/search        → Buscar con filtros (category, maxTime)
+POST   /api/recipes               → Crear nueva receta
+PUT    /api/recipes/{id}          → Editar receta (solo creador)
+DELETE /api/recipes/{id}          → Eliminar receta (creador o ADMIN)
+PATCH  /api/recipes/{id}/image    → Actualizar imagen de receta
+```
+
+#### Favoritos
+```
+GET    /api/favorites             → Listar mis recetas favoritas
+POST   /api/favorites/{recipeId}  → Añadir a favoritos
+DELETE /api/favorites/{recipeId}  → Eliminar de favoritos
+```
+
+#### Medios
+```
+POST   /api/media/upload          → Subir imagen a Cloudinary
+```
+
+## 🔐 Seguridad
+
+- **Autenticación Stateless:** Cada petición valida su JWT token
+- **Expiración de Tokens:** 60 días de validez
+- **Hashing de Contraseñas:** BCrypt con salt
+- **CORS Configurado:** Para comunicación con frontend
+- **Endpoints Públicos:** Solo signup y login sin autenticación
+- **Control de Acceso:** Usuarios solo pueden editar/eliminar sus propios recursos
+
+## 🛠️ Requisitos Previos
+
+- **JDK 17+** (OpenJDK o Oracle JDK)
+- **Maven 3.6+**
+- **MySQL 8+** (conexión local o remota)
+- **Cloudinary Account** (para image hosting, opcional para desarrollo)
+
+## 🚀 Instalación y Ejecución
+
+### ⚠️ Nota sobre Ambiente
+
+Esta aplicación está configurada para ejecutarse **en ambiente local** únicamente. Si necesitas hacer deploy a producción, requiere configuraciones adicionales de seguridad y escalabilidad.
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/tu_usuario/FoodMatch.git
+cd FoodMatch
+```
+
+### 2. Configurar base de datos
+```bash
+# Crear base de datos
+mysql -u root -p
+> CREATE DATABASE foodmatch_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 3. Configurar credenciales en `application.properties`
+```properties
+# Base de datos
+spring.datasource.url=jdbc:mysql://localhost:3306/foodmatch_db
+spring.datasource.username=root
+spring.datasource.password=tu_contraseña
+
+# Cloudinary (opcional)
+cloudinary.cloud_name=tu_cloud_name
+cloudinary.api_key=tu_api_key
+cloudinary.api_secret=tu_api_secret
+
+# JWT
+jwt.secret=tu_secret_muy_largo_y_seguro
+jwt.expiration=5184000000
+```
+
+### 4. Instalar dependencias
+```bash
+mvn clean install
+```
+
+### 5. Ejecutar la aplicación
+```bash
+mvn spring-boot:run
+```
+
+La API estará disponible en: **http://localhost:8080**
+
+## 📚 Documentación API
+
+La documentación Swagger está disponible en:
+```
+http://localhost:8080/swagger-ui/
+```
+
+## 🧪 Testing
+
+```bash
+# Ejecutar todos los tests
+mvn test
+
+# Ejecutar tests de un módulo específico
+mvn test -Dtest=UserControllerTest
+```
+
+## 📁 Estructura de Carpetas
+
+```
+src/main/java/edu/abga/foodmatch/
+├── FoodMatchApplication.java      # Clase principal
+├── config/                         # Configuración (JWT, Security, Swagger)
+├── controller/                     # Endpoints REST
+├── service/                        # Lógica de negocio
+├── repository/                     # Acceso a datos (JPA)
+├── model/                          # Entidades JPA
+├── exception/                      # Manejo de excepciones personalizado
+├── security/                       # Configuración JWT y seguridad
+└── util/                           # Utilidades
+```
+
+## 📦 Dependencias Principales
+
+```xml
+<!-- Spring Boot -->
+<artifactId>spring-boot-starter-web</artifactId>
+<artifactId>spring-boot-starter-data-jpa</artifactId>
+<artifactId>spring-boot-starter-security</artifactId>
+
+<!-- Base de Datos -->
+<artifactId>mysql-connector-java</artifactId>
+
+<!-- JWT -->
+<artifactId>jjwt</artifactId>
+
+<!-- Lombok -->
+<artifactId>lombok</artifactId>
+
+<!-- Cloudinary -->
+<artifactId>cloudinary-http44</artifactId>
+
+<!-- Swagger/OpenAPI -->
+<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+```
+
+## 🤝 Integración con Frontend
+
+La aplicación Flutter (`foodmatch_app`) consume esta API. El cliente debe:
+
+1. Registrarse/Login para obtener JWT token
+2. Incluir token en header: `Authorization: Bearer {token}`
+3. Manejar refresh de token antes de expiración (60 días)
+4. Usar endpoints de búsqueda para la funcionalidad swipe
+
+## 📋 Notas sobre el MVP
+
+✅ **Implementado:**
+- Autenticación JWT con validación de tokens
+- CRUD completo de recetas
+- Sistema de favoritos funcional
+- Búsqueda y filtrado
+- Manejo de imágenes con Cloudinary
+- Validaciones de entrada
+- Manejo de errores personalizado
+
+⚠️ **No incluido en MVP:**
+- Paginación automática (implementable fácilmente)
+- Búsqueda por título
+- Endpoint de borrar usuario
+- Gestión avanzada de administrador
+- Notificaciones push (config existe, no activado)
+
+## 📄 Licencia
+
+Este proyecto es parte del Trabajo de Fin de Ciclo (TFC).
 
 

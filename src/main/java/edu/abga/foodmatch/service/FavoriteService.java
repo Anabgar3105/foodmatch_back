@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.service;
 
+import edu.abga.foodmatch.exception.ErrorCode;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.Recipe;
 import edu.abga.foodmatch.model.User;
@@ -34,10 +35,10 @@ public class FavoriteService {
     @Transactional
     public void addFavorite(Long userId, Long recipeId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         Recipe recipe = recipeRepository.findRecipeById(recipeId, userId)
-                .orElseThrow(() -> new FoodMatchException("Receta no encontrada", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         user.getFavouriteRecipes().add(recipe);
         userRepository.save(user);
@@ -51,10 +52,10 @@ public class FavoriteService {
     @Transactional
     public void removeFavorite(Long userId, Long recipeId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new FoodMatchException("Receta no encontrada", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         user.getFavouriteRecipes().remove(recipe);
         userRepository.save(user);
@@ -68,7 +69,7 @@ public class FavoriteService {
     @Transactional(readOnly = true)
     public List<RecipeCardDto> getUserFavorites(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new FoodMatchException("Usuario no encontrado", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FoodMatchException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         return user.getFavouriteRecipes().stream()
                 .map(recipeMapper::toCardDto)

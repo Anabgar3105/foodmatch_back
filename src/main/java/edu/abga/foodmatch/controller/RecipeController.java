@@ -1,5 +1,7 @@
 package edu.abga.foodmatch.controller;
 
+import edu.abga.foodmatch.exception.ErrorCode;
+import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.RecipeCategory;
 import edu.abga.foodmatch.model.dto.RecipeCardDto;
 import edu.abga.foodmatch.model.dto.RecipeDetailDto;
@@ -7,12 +9,15 @@ import edu.abga.foodmatch.service.RecipeService;
 import edu.abga.foodmatch.util.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * REST controller for managing the recipe catalog.
@@ -35,8 +40,11 @@ public class RecipeController {
      */
     @PostMapping
     @Operation(summary = "Crear receta", description = "Guarda una receta con sus ingredientes y pasos")
-    public ResponseEntity<RecipeDetailDto> create(@RequestBody RecipeDetailDto dto) {
-        return new ResponseEntity<>(recipeService.createRecipe(dto), HttpStatus.CREATED);
+    public ResponseEntity<RecipeDetailDto> create(
+            @RequestBody RecipeDetailDto dto,
+            Principal principal) {
+        RecipeDetailDto createdRecipe = recipeService.createRecipe(dto, principal.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRecipe);
     }
 
     /**
@@ -49,6 +57,22 @@ public class RecipeController {
     public List<RecipeDetailDto> getAll() {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         return recipeService.getRecipesForUser(currentUserId);
+    }
+
+    /**
+     * Endpoint to retrieve the complete details of a specific recipe.
+     * Uses the authenticated user's ID to ensure privacy (only public or owned recipes are returned).
+     *
+     * @param id The unique identifier of the recipe.
+     * @return ResponseEntity with the complete RecipeDetailDto.
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener detalle de receta", description = "Obtiene toda la información (ingredientes y pasos) de una receta específica")
+    public ResponseEntity<RecipeDetailDto> getRecipeById(@PathVariable("id") Long id) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        RecipeDetailDto recipeDetail = recipeService.getRecipeById(id, currentUserId);
+
+        return ResponseEntity.ok(recipeDetail);
     }
 
     /**
@@ -72,6 +96,37 @@ public class RecipeController {
     }
 
     /**
+     * Endpoint to retrieve the recipes created by the authenticated user.
+     * @param principal the security principal containing the authenticated user's information
+     * @return ResponseEntity with a list of RecipeCardDto representing the user's own recipes.
+     */
+    @GetMapping("/my-recipes")
+    @Operation(summary = "Obtener mis recetas", description = "Devuelve las recetas creadas por el usuario autenticado")
+    public ResponseEntity<List<RecipeCardDto>> getMyRecipes(Principal principal) {
+        List<RecipeCardDto> myRecipes = recipeService.getMyRecipes(principal.getName());
+        return ResponseEntity.ok(myRecipes);
+    }
+
+    /**
+     * Endpoint to update an existing recipe.
+     * Only the creator of the recipe can perform this action.
+     * @param id the ID of the recipe to update
+     * @param recipeDto the DTO containing the updated recipe information
+     * @param principal the security principal containing the authenticated user's information
+     * @return ResponseEntity with the updated RecipeDetailDto if the update was successful.
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar una receta", description = "Modifica los datos de una receta existente (solo para el creador)")
+    public ResponseEntity<RecipeDetailDto> updateRecipe(
+            @PathVariable Long id,
+            @Valid @RequestBody RecipeDetailDto recipeDto,
+            Principal principal) {
+
+        RecipeDetailDto updatedRecipe = recipeService.updateRecipe(id, recipeDto, principal.getName());
+        return ResponseEntity.ok(updatedRecipe);
+    }
+
+    /**
      * Endpoint to delete a specific recipe.
      * Requires ownership of the recipe or ADMIN role.
      *
@@ -86,5 +141,26 @@ public class RecipeController {
         recipeService.deleteRecipe(id, currentUserId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Update the image URL of an existing recipe.
+     * @param id the ID of the recipe to update.
+     * @param body the request body containing the new image URL in the format: {"url": "new_image_url"}
+     * @return ResponseEntity with the updated RecipeDetailDto.
+     */
+    @PatchMapping("/{id}/image")
+    @Operation(summary = "Actualizar imagen de receta", description = "Actualiza la URL de la imagen de una receta existente")
+    public ResponseEntity<RecipeDetailDto> updateImage(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+
+        String imageUrl = body.get("url");
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            throw new FoodMatchException(ErrorCode.INVALID_INPUT, "La URL de la imagen es obligatoria", HttpStatus.BAD_REQUEST);
+        }
+
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return ResponseEntity.ok(recipeService.updateRecipeImage(id, imageUrl, currentUserId));
     }
 }

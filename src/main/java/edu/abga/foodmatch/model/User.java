@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -74,13 +76,19 @@ public class User {
     private Role role;
 
     /**
+     * Avatar URL
+     */
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    /**
      * RegisterDate
      */
     @CreationTimestamp
     @Column(name = "register_date", updatable = false)
     private LocalDateTime registerDate;
 
-    /**
+      /**
      * Favourite recipes
      */
     @Builder.Default
@@ -90,5 +98,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "recipe_id")
     )
+    @JsonManagedReference
+    @EqualsAndHashCode.Exclude
     private Set<Recipe> favouriteRecipes = new HashSet<>();
 }

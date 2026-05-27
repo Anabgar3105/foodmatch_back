@@ -1,5 +1,6 @@
 package edu.abga.foodmatch.util;
 
+import edu.abga.foodmatch.UtilsForTests;
 import edu.abga.foodmatch.exception.FoodMatchException;
 import edu.abga.foodmatch.model.dto.UserRegistrationDto;
 import org.junit.jupiter.api.Test;

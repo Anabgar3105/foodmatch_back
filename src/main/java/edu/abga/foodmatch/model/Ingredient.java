@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entity that represents an ingredient associated with a recipe.
@@ -36,10 +38,12 @@ public class Ingredient {
     @Column(length = 100)
     private String quantity;
 
-    /**
+     /**
      * Recipe
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Recipe recipe;
 }
